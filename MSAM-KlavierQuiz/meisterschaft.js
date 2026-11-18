@@ -367,3 +367,67 @@ window.pruefeMsamLehrpersonenPin = async () => {
       <div>${listeHTML || "<p>Es hat sich noch kein Schüler unter deinem Namen angemeldet.</p>"}</div>
     </div>`;
 };
+// === LEHRERCOCKPIT & SPIELSTAND-SCHUTZ (AM ENDE VON MEISTERSCHAFT.JS) ===
+
+// 1. Lehrercockpit-Ansicht (nutzt deine bestehende ladeAlleMsamSchuelerAusCloud)
+async function oeffneMsamLehrerCockpit() {
+  const pass = prompt("Lehrercockpit-Passwort eingeben:");
+  if (pass !== "msam2026") {
+    alert("Falsches Passwort.");
+    return;
+  }
+
+  const ziel = document.getElementById("app") || document.body;
+  ziel.innerHTML = `<div class="card" style="max-width:720px;margin:20px auto;text-align:center;"><h3>Lade Schülerdaten aus Firebase...</h3></div>`;
+
+  try {
+    const liste = await ladeAlleMsamSchuelerAusCloud();
+    liste.sort((a, b) => (b.sterne || 0) - (a.sterne || 0));
+
+    const zeilen = liste.map((s) => `
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:10px;text-align:left;font-weight:700;">${s.vorname} ${s.nachname}</td>
+        <td style="padding:10px;text-align:left;">${s.lehrpersonName || s.lehrpersonId || "-"}</td>
+        <td style="padding:10px;text-align:center;font-weight:800;">⭐ ${s.sterne || 0}</td>
+        <td style="padding:10px;text-align:center;">${s.erledigtAnzahl || 0}</td>
+        <td style="padding:10px;text-align:left;font-size:13px;">${s.letztesSpiel || "-"}</td>
+      </tr>
+    `).join("");
+
+    ziel.innerHTML = `
+      <div class="card" style="max-width:820px;margin:20px auto;border-top:6px solid #0284c7;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <h2 style="margin:0;">🎓 Lehrercockpit (<span style="text-transform:lowercase;">msam quiz kids</span>)</h2>
+          <button class="btn-ghost" onclick="location.reload()">Zurück zum Quiz</button>
+        </div>
+        <p style="color:#475569;">Alle registrierten Schülerinnen und Schüler (${liste.length}) sortiert nach Sternen:</p>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+            <thead>
+              <tr style="background:#f1f5f9;border-bottom:2px solid #cbd5e1;">
+                <th style="padding:10px;text-align:left;">Name</th>
+                <th style="padding:10px;text-align:left;">Lehrperson</th>
+                <th style="padding:10px;text-align:center;">Sterne</th>
+                <th style="padding:10px;text-align:center;">Aufgaben</th>
+                <th style="padding:10px;text-align:left;">Letztes Spiel</th>
+              </tr>
+            </thead>
+            <tbody>${zeilen || '<tr><td colspan="5" style="padding:16px;text-align:center;">Noch keine Einträge gefunden.</td></tr>'}</tbody>
+          </table>
+        </div>
+      </div>`;
+  } catch (err) {
+    ziel.innerHTML = `<div class="card" style="max-width:600px;margin:20px auto;color:#dc2626;"><h3>Fehler beim Laden:</h3><p>${err.message}</p><button class="btn-ghost" onclick="location.reload()">Zurück</button></div>`;
+  }
+}
+
+// 2. Unauffälligen "Lehrercockpit"-Link automatisch unten auf der Seite einblenden
+window.addEventListener("DOMContentLoaded", () => {
+  if (!document.getElementById("msam-cockpit-link")) {
+    const link = document.createElement("div");
+    link.id = "msam-cockpit-link";
+    link.style.cssText = "text-align:center;margin:24px 0 12px 0;font-size:13px;opacity:0.65;";
+    link.innerHTML = `<a href="#" onclick="event.preventDefault(); oeffneMsamLehrerCockpit();" style="color:#475569;text-decoration:underline;">🎓 Lehrercockpit</a>`;
+    document.body.appendChild(link);
+  }
+});
