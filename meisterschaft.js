@@ -5,10 +5,48 @@ const MSAM_HOST = "firestore" + ".googleapis.com";
 const MSAM_PROJECT_ID = "msam-quiz-kids";
 const MSAM_FIRESTORE_URL = `${MSAM_PROTO}${MSAM_HOST}/v1/projects/${MSAM_PROJECT_ID}/databases/(default)/documents/msam_schueler`;
 const MSAM_LEHRPERSONEN = Array.of(
-  { id: "lp1", name: "Lehrperson 1 (MSAM)", pin: "1111" },
-  { id: "lp2", name: "Lehrperson 2 (MSAM)", pin: "2222" },
-  { id: "lp3", name: "Lehrperson 3 (MSAM)", pin: "3333" }
+  { id: "adrian_popp", name: "Adrian Popp (Drumset / Perkussion)", pin: "1001" },
+  { id: "albert_graf", name: "Albert Graf (Hackbrett)", pin: "1002" },
+  { id: "alessia_heim", name: "Alessia Heim (Hackbrett)", pin: "1003" },
+  { id: "aline_spaltenstein", name: "Aline Spaltenstein (Kontrabass)", pin: "1004" },
+  { id: "alla_ternova", name: "Alla Ternova (Streicher)", pin: "1005" },
+  { id: "anna_fronczak", name: "Anna Fronczak (Klarinette / Gesang)", pin: "1006" },
+  { id: "clarigna_kueng", name: "Clarigna Küng (Violine / Viola)", pin: "1007" },
+  { id: "claudia_mantovani", name: "Claudia Mantovani (Harfe)", pin: "1008" },
+  { id: "daniel_weniger", name: "Daniel Weniger (Gitarre / E-Gitarre)", pin: "1009" },
+  { id: "dieter_magsam", name: "Dieter Magsam (Gitarre / Ukulele)", pin: "1010" },
+  { id: "dionys_tschopp", name: "Dionys Tschopp (Cornet / Trompete)", pin: "1011" },
+  { id: "eliane_buechel", name: "Eliane Büchel (Akkordeon / Schwyzerörgeli)", pin: "1012" },
+  { id: "emanuel_andriescu", name: "Emanuel Andriescu (Saxofon)", pin: "1013" },
+  { id: "enrico_cerpelloni", name: "Enrico Cerpelloni (Horn / Alphorn)", pin: "1014" },
+  { id: "knight_eun_joo", name: "Eun-Joo Knight (Blockflöte)", pin: "1015" },
+  { id: "franziska_raymann", name: "Franziska Raymann (Eltern-Kind-Singen)", pin: "1016" },
+  { id: "frida_sailer", name: "Frida Sailer (Jugendchor / El-Ki-Si)", pin: "1017" },
+  { id: "hiroko_haag", name: "Hiroko Haag (Gesang / Orgel / El-Ki-Si)", pin: "1018" },
+  { id: "jasmin_knobel", name: "Jasmin Knobel (Akkordeon / Schwyzerörgeli)", pin: "1019" },
+  { id: "kinga_horvath", name: "Kinga Horvath (Querflöte / Blockflöte)", pin: "1020" },
+  { id: "krasimir_stefanov", name: "Krasimir Stefanov (Posaune)", pin: "1021" },
+  { id: "linus_tschopp", name: "Linus Tschopp (Euphonium / Es-Horn / Posaune)", pin: "1022" },
+  { id: "livia_loewe", name: "Livia Loewe (Violine / Viola)", pin: "1023" },
+  { id: "manuela_engel", name: "Manuela Engel (Klavier)", pin: "1024" },
+  { id: "martin_senn", name: "Martin Senn (Klavier / E-Piano / Keyboard)", pin: "1025" },
+  { id: "mathieu_casareale", name: "Mathieu Casareale (Drumset / Perkussion)", pin: "1026" },
+  { id: "mihaela_stefanova", name: "Mihaela Stefanova (Klavier / Orgel)", pin: "1027" },
+  { id: "milena_salvatti", name: "Milena Salvatti (Violoncello)", pin: "1028" },
+  { id: "olaf_krueger", name: "Olaf Krüger (Violoncello)", pin: "1029" },
+  { id: "oleksii_samoriezov", name: "Oleksii Samoriezov (Gitarre / Ukulele / E-Gitarre)", pin: "1030" },
+  { id: "patrick_kessler", name: "Patrick Kessler (Kontrabass)", pin: "1031" },
+  { id: "regula_weiss", name: "Regula Weiss (Oboe)", pin: "1032" },
+  { id: "ruediger_schwedes", name: "Rüdiger Schwedes (Fagott)", pin: "1033" },
+  { id: "sarah_fleten", name: "Sarah Fleten (Querflöte)", pin: "1034" },
+  { id: "sari_weber", name: "Sari Weber (Klavier)", pin: "1035" },
+  { id: "sissi_riegg", name: "Sissi Riegg (Jodel)", pin: "1036" },
+  { id: "stephane_boelingen", name: "Stéphane Bölingen (Klavier)", pin: "1037" },
+  { id: "thorsten_pabst", name: "Thorsten Pabst (Klavier)", pin: "1038" },
+  { id: "ute_weyrich", name: "Ute Weyrich (Trompete)", pin: "1039" },
+  { id: "wolfgang_wahl", name: "Wolfgang Wahl (Drums)", pin: "1040" }
 );
+
 
 function ladeMsamProfil() {
   try {
