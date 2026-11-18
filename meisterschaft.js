@@ -4,6 +4,38 @@ const MSAM_PROTO = "https" + "://";
 const MSAM_HOST = "firestore" + ".googleapis.com";
 const MSAM_PROJECT_ID = "msam-quiz-kids";
 const MSAM_FIRESTORE_URL = `${MSAM_PROTO}${MSAM_HOST}/v1/projects/${MSAM_PROJECT_ID}/databases/(default)/documents/msam_schueler`;
+const MSAM_LEHRPERSONEN = Array.of(
+  { id: "lp1", name: "Lehrperson 1 (MSAM)", pin: "1111" },
+  { id: "lp2", name: "Lehrperson 2 (MSAM)", pin: "2222" },
+  { id: "lp3", name: "Lehrperson 3 (MSAM)", pin: "3333" }
+);
+
+function ladeMsamProfil() {
+  try {
+    const roh = localStorage.getItem("msamSchuelerProfil");
+    return roh ? JSON.parse(roh) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function speichereMsamProfil(profil) {
+  try {
+    localStorage.setItem("msamSchuelerProfil", JSON.stringify(profil));
+  } catch (e) {}
+}
+
+function baueMsamStatusLeiste() {
+  const profil = ladeMsamProfil();
+  if (!profil) return "";
+  return `
+    <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:12px;">
+      <button class="btn-ghost" onclick="zeigeMsamRangliste(false)">🏆 Rangliste</button>
+      <button class="btn-ghost" onclick="zeigeMsamAnmeldung(true)">✏️ Name / Lehrperson</button>
+      <button class="btn-ghost" onclick="zeigeMsamLehrpersonenLogin()">👩‍🏫 Lehrpersonen</button>
+    </div>`;
+}
+
 async function msamSafeFirestorePatch(profil, body) {
   const docUrl = `${MSAM_FIRESTORE_URL}/${encodeURIComponent(profil.id)}`;
 

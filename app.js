@@ -532,10 +532,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return { sterne: 0, erledigt: Array.of() };
     };
 
-    window.speichereFortschritt = function(daten) {
+ window.speichereFortschritt = function(daten) {
       try {
         localStorage.setItem(speicherSchluessel(), JSON.stringify(daten));
+        localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(daten));
       } catch (e) {}
+      aktualisiereSterneAnzeige();
+      if (typeof synchronisiereFortschrittMitCloud === "function") {
+        synchronisiereFortschrittMitCloud().catch((err) => console.warn("Cloud-Sync:", err));
+      }
     };
   }
 })();
