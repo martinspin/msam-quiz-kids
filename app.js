@@ -1,8 +1,7 @@
-// msam quiz kids: Hauptsteuerung & Startseite im MSAM-Stil
-
 const KAPITEL_DATEN = Array.of(
-    {
+  {
     id: 0,
+    stufe: 1,
     titel: "1. Gehör-Detektive",
     beschreibung: "Trainiere deine Ohren: Hoch & tief, Schritte & Sprünge, Staccato, Legato, Dur & Moll.",
     farbe: "#ec4899",
@@ -19,6 +18,7 @@ const KAPITEL_DATEN = Array.of(
   },
   {
     id: 1,
+    stufe: 1,
     titel: "2. Stammtöne",
     beschreibung: "Lerne die 7 Stammtöne C, D, E, F, G, A, H, Nachbartöne und Doppelschritte.",
     farbe: "#ef4444",
@@ -35,6 +35,7 @@ const KAPITEL_DATEN = Array.of(
   },
   {
     id: 2,
+    stufe: 1,
     titel: "3. Klaviertasten",
     beschreibung: "Finde C bis H sicher über die Zwillinge und Drillinge auf dem Klavier.",
     farbe: "#f97316",
@@ -51,6 +52,7 @@ const KAPITEL_DATEN = Array.of(
   },
   {
     id: 4,
+    stufe: 1,
     titel: "4. Relatives Notenlesen",
     beschreibung: "Erkenne Linien- und Zwischenraumnoten, Schritte, Sprünge und Tonhöhen.",
     farbe: "#22c55e",
@@ -66,6 +68,7 @@ const KAPITEL_DATEN = Array.of(
   },
   {
     id: 5,
+    stufe: 1,
     titel: "5. Rhythmus & Notenwerte",
     beschreibung: "Spüre Viertel-, Halbe-, Dreiviertel- und Ganze Noten mit Rhythmus-Wörtern und Takten.",
     farbe: "#0891b2",
@@ -82,6 +85,7 @@ const KAPITEL_DATEN = Array.of(
   },
   {
     id: 6,
+    stufe: 1,
     titel: "6. Violinschlüssel & Stücke",
     beschreibung: "Lies C bis A im Violinschlüssel, spiele echte Kinderlieder und hol dir dein Diplom!",
     farbe: "#7c3aed",
@@ -95,9 +99,105 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap6_5", nr: 5, titel: "6.5 Ton & Rhythmus-Kombi", beschreibung: "Erkenne Tonname und Rhythmus gleichzeitig." },
       { id: "kap6_6", nr: 6, titel: "6.6 MSAM Musik-Kids Meister-Diplom", beschreibung: "Die grosse Abschlussprüfung!" }
     )
+  },
+  {
+    id: 7,
+    stufe: 2,
+    titel: "7. Violinschlüssel bis zum hohen G",
+    beschreibung: "Erweitere deinen Tonraum nach oben: H, C5, D5, E5, F5 und das hohe G5 sicher lesen!",
+    farbe: "#db2777",
+    icon: "🚀",
+    aktiv: true,
+    spiele: Array.of(
+      { id: "kap7_1", nr: 1, titel: "7.1 Anker-Töne oben (C5 – E5 – G5)", beschreibung: "Finde das hohe C, E und G im Violinschlüssel." },
+      { id: "kap7_2", nr: 2, titel: "7.2 Alle Noten von G4 bis G5", beschreibung: "Benenne H, C, D, E, F und G sicher." },
+      { id: "kap7_3", nr: 3, titel: "7.3 Hohe Note auf dem Klavier", beschreibung: "Tippe die richtige Taste in der oberen Oktave an." },
+      { id: "kap7_4", nr: 4, titel: "7.4 Melodien im grossen Tonraum", beschreibung: "Spiele bekannte Melodien von C4 bis G5 nach Noten." },
+      { id: "kap7_6", nr: 5, titel: "7.5 Höhenflug-Meister", beschreibung: "Abschluss-Challenge im erweiterten Violinschlüssel!" }
+    )
+  },
+  {
+    id: 8,
+    stufe: 2,
+    titel: "8. Bassschlüssel für die linke Hand",
+    beschreibung: "Entdecke die tiefen Töne der linken Hand rund um das kleine C und das F.",
+    farbe: "#2563eb",
+    icon: "𝄢",
+    aktiv: true,
+    spiele: Array.of(
+      { id: "kap8_1", nr: 1, titel: "8.1 Anker-Töne im Bass (C – F – G)", beschreibung: "Die drei wichtigsten Orientierungspunkte für links." },
+      { id: "kap8_2", nr: 2, titel: "8.2 Fünf-Finger-Raum (C bis G)", beschreibung: "Lies C, D, E, F und G im Bassschlüssel sicher." },
+      { id: "kap8_3", nr: 3, titel: "8.3 Bass-Note auf dem Klavier", beschreibung: "Finde den tiefen Ton links vom Schloss-C." },
+      { id: "kap8_4", nr: 4, titel: "8.4 Kleine Bass-Melodien", beschreibung: "Spiele erste Begleit-Melodien für die linke Hand." },
+      { id: "kap8_6", nr: 5, titel: "8.5 Bassschlüssel-Profi", beschreibung: "Abschluss-Challenge für die linke Hand!" }
+    )
+  },
+  {
+    id: 9,
+    stufe: 2,
+    titel: "9. Pausen & Achtelnoten",
+    beschreibung: "Spüre schnelle Achtelpaare (Ti-ti) sowie Viertel- und Halbe Pausen im Takt.",
+    farbe: "#0d9488",
+    icon: "⏱️",
+    aktiv: true,
+    spiele: Array.of(
+      { id: "kap9_1", nr: 1, titel: "9.1 Achtelnoten (Ti-ti) kennenlernen", beschreibung: "Zwei flinke Schläge auf einen Puls hören und lesen." },
+      { id: "kap9_2", nr: 2, titel: "9.2 Viertel- und Halbe Pausen", beschreibung: "Auch Stille gehört zur Musik – zähle genau mit!" },
+      { id: "kap9_3", nr: 3, titel: "9.3 Rhythmus-Echo mit Pausen", beschreibung: "Erkenne den passenden Rhythmus zum Hörbeispiel." },
+      { id: "kap9_4", nr: 4, titel: "9.4 Takte bauen mit Achteln & Pausen", beschreibung: "Fülle 3/4- und 4/4-Takte exakt auf." },
+      { id: "kap9_6", nr: 5, titel: "9.5 Takt-Meister Stufe 2", beschreibung: "Abschluss-Challenge für Rhythmus-Entdecker!" }
+    )
+  },
+  {
+    id: 10,
+    stufe: 2,
+    titel: "10. Erste schwarze Tasten (Fis & B)",
+    beschreibung: "Lerne die zwei wichtigsten schwarzen Tasten Fis (#) und B (b) sowie das Auflösungszeichen kennen.",
+    farbe: "#ea580c",
+    icon: "🎹",
+    aktiv: true,
+    spiele: Array.of(
+      { id: "kap10_1", nr: 1, titel: "10.1 Das Kreuz (#) macht aus F ein Fis", beschreibung: "Ein Halbtonschritt nach rechts – finde Fis!" },
+      { id: "kap10_2", nr: 2, titel: "10.2 Das Be (b) macht aus H ein B", beschreibung: "Ein Halbtonschritt nach links – finde B!" },
+      { id: "kap10_3", nr: 3, titel: "10.3 Auflösungszeichen (♮) – zurück auf Weiss", beschreibung: "Wann gilt wieder F oder H?" },
+      { id: "kap10_4", nr: 4, titel: "10.4 Fis & B im Notenbild erkennen", beschreibung: "Lies Vorzeichen vor der Note sicher." },
+      { id: "kap10_6", nr: 5, titel: "10.5 Vorzeichen-Entdecker", beschreibung: "Abschluss-Challenge für Fis und B!" }
+    )
+  },
+  {
+    id: 11,
+    stufe: 2,
+    titel: "11. Dynamik & Ausdruck",
+    beschreibung: "Entdecke leise (p), laut (f), crescendo, staccato und legato beim Hören und Lesen.",
+    farbe: "#16a34a",
+    icon: "🎭",
+    aktiv: true,
+    spiele: Array.of(
+      { id: "kap11_1", nr: 1, titel: "11.1 Piano (p) und Forte (f)", beschreibung: "Was bedeuten p, mp, mf und f?" },
+      { id: "kap11_2", nr: 2, titel: "11.2 Crescendo & Decrescendo", beschreibung: "Wird die Musik lauter oder leiser?" },
+      { id: "kap11_3", nr: 3, titel: "11.3 Staccato-Punkt & Legato-Bogen", beschreibung: "Erkenne Spielweisen im Notenbild." },
+      { id: "kap11_4", nr: 4, titel: "11.4 Ausdrucks-Detektiv", beschreibung: "Höre das Beispiel und wähle die passenden Zeichen." },
+      { id: "kap11_6", nr: 5, titel: "11.5 Ausdrucks-Künstler", beschreibung: "Abschluss-Challenge für Dynamik & Vortrag!" }
+    )
+  },
+  {
+    id: 12,
+    stufe: 2,
+    titel: "12. Beidhändig lesen & Entdecker-Diplom",
+    beschreibung: "Lies rechte und linke Hand im Klaviersystem zusammen und hol dir dein Stufe-2-Diplom!",
+    farbe: "#9333ea",
+    icon: "🎓",
+    aktiv: true,
+    spiele: Array.of(
+      { id: "kap12_1", nr: 1, titel: "12.1 Rechte Hand oder linke Hand?", beschreibung: "Ordne Noten im grossen Klaviersystem richtig zu." },
+      { id: "kap12_2", nr: 2, titel: "12.2 Wechselspiel rechts & links", beschreibung: "Spiele kleine Frage-Antwort-Melodien beidhändig." },
+      { id: "kap12_3", nr: 3, titel: "12.3 Begleitton links + Melodie rechts", beschreibung: "Kombiniere Bass-Anker und Melodie-Töne." },
+      { id: "kap12_4", nr: 4, titel: "12.4 Konzertstück-Check", beschreibung: "Noten, Rhythmus, Vorzeichen & Dynamik zusammen." },
+      { id: "kap12_6", nr: 5, titel: "12.5 MSAM Entdecker-Diplom · Stufe 2", beschreibung: "Die grosse Abschlussprüfung der Entdecker-Kids!" }
+    )
   }
-
 );
+
 
 function ladeFortschritt() {
   try {
@@ -199,13 +299,18 @@ function zeigeKapitel(kapitelId) {
 }
 
 function starteKapitelSpiel(kapitelId, spielNr) {
-  if (kapitelId === 0 && typeof starteKap0Spiel === "function") starteKap0Spiel(spielNr);
-  if (kapitelId === 1 && typeof starteKap1Spiel === "function") starteKap1Spiel(spielNr);
-  if (kapitelId === 2 && typeof starteKap2Spiel === "function") starteKap2Spiel(spielNr);
-  if (kapitelId === 4 && typeof starteKap4Spiel === "function") starteKap4Spiel(spielNr);
-  if (kapitelId === 5 && typeof starteKap5Spiel === "function") starteKap5Spiel(spielNr);
-  if (kapitelId === 6 && typeof starteKap6Spiel === "function") starteKap6Spiel(spielNr);
+  const fn = window[`starteKap${kapitelId}Spiel`];
+  if (typeof fn === "function") fn(spielNr);
 }
+
+window.toggleMsamStufe = function(stufeNr) {
+  const bereich = document.getElementById(`stufe-inhalt-${stufeNr}`);
+  const pfeil = document.getElementById(`stufe-pfeil-${stufeNr}`);
+  if (!bereich) return;
+  const istOffen = bereich.style.display !== "none";
+  bereich.style.display = istOffen ? "none" : "block";
+  if (pfeil) pfeil.textContent = istOffen ? "▶" : "▼";
+};
 
 function zeigeStartseite() {
   if (typeof appMusik !== "undefined") appMusik.resumeWennAktiv();
@@ -220,19 +325,49 @@ function zeigeStartseite() {
     ? `Hallo ${profil.vorname}! 🎹`
     : `Willkommen bei <span style="text-transform:lowercase;">msam quiz kids</span>! 🎹`;
 
-  const kartenHTML = KAPITEL_DATEN.map((kap) => {
-    const erledigtAnzahl = kap.spiele.filter((s) => daten.erledigt.includes(s.id)).length;
-    const statusText = kap.aktiv
-      ? `${erledigtAnzahl} / ${kap.spiele.length} Spiele gemeistert`
-      : "Kommt als Nächstes";
+  const stufenMeta = Array.of(
+    { nr: 1, titel: "Stufe 1 · Einsteiger-Kids", untertitel: "Kapitel 1–6: Gehör, Stammtöne, Klaviatur, Noten & Rhythmus", farbe: "#e11d48", offen: true },
+    { nr: 2, titel: "Stufe 2 · Entdecker-Kids", untertitel: "Kapitel 7–12: Hohes G, Bassschlüssel, Achtel & Pausen, Fis & B, Dynamik", farbe: "#7c3aed", offen: true }
+  );
+
+  const stufenHTML = stufenMeta.map((st) => {
+    const stufenKapitel = KAPITEL_DATEN.filter((k) => (k.stufe || 1) === st.nr);
+    const gesamtSpiele = stufenKapitel.reduce((sum, k) => sum + k.spiele.length, 0);
+    const erledigtSpiele = stufenKapitel.reduce(
+      (sum, k) => sum + k.spiele.filter((s) => daten.erledigt.includes(s.id)).length,
+      0
+    );
+
+    const kartenHTML = stufenKapitel.map((kap) => {
+      const erledigtAnzahl = kap.spiele.filter((s) => daten.erledigt.includes(s.id)).length;
+      return `
+        <div class="chapter-card" style="border-top: 6px solid ${kap.farbe}; cursor:pointer;"
+             onclick="zeigeKapitel(${kap.id})">
+          <div class="chapter-icon">${kap.icon}</div>
+          <h3>${kap.titel}</h3>
+          <p>${kap.beschreibung}</p>
+          <div class="chapter-progress">${erledigtAnzahl} / ${kap.spiele.length} Spiele gemeistert</div>
+        </div>`;
+    }).join("");
 
     return `
-      <div class="chapter-card" style="border-top: 6px solid ${kap.farbe}; ${kap.aktiv ? "cursor:pointer;" : "opacity:0.65;"}"
-           onclick="${kap.aktiv ? `zeigeKapitel(${kap.id})` : ""}">
-        <div class="chapter-icon">${kap.icon}</div>
-        <h3>${kap.titel}</h3>
-        <p>${kap.beschreibung}</p>
-        <div class="chapter-progress">${statusText}</div>
+      <div style="margin-bottom: 18px; border-radius: 18px; overflow: hidden; border: 2px solid #e2e8f0; background: #ffffff; box-shadow: 0 4px 14px rgba(0,0,0,0.04);">
+        <button type="button" onclick="toggleMsamStufe(${st.nr})"
+                style="width:100%; display:flex; justify-content:space-between; align-items:center; padding:16px 20px; background:#f8fafc; border:none; border-left:8px solid ${st.farbe}; cursor:pointer; text-align:left; gap:12px;">
+          <div>
+            <div style="font-size:19px; font-weight:900; color:#0f172a;">${st.titel}</div>
+            <div style="font-size:13px; color:#475569; margin-top:2px;">${st.untertitel}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+            <span style="background:#ffffff; border:2px solid #cbd5e1; border-radius:999px; padding:4px 12px; font-size:13px; font-weight:800; color:#334155;">
+              ${erledigtSpiele} / ${gesamtSpiele} ⭐
+            </span>
+            <span id="stufe-pfeil-${st.nr}" style="font-size:16px; font-weight:900; color:#475569;">${st.offen ? "▼" : "▶"}</span>
+          </div>
+        </button>
+        <div id="stufe-inhalt-${st.nr}" style="display:${st.offen ? "block" : "none"}; padding:16px;">
+          <div class="chapters-grid">${kartenHTML}</div>
+        </div>
       </div>`;
   }).join("");
 
@@ -242,10 +377,10 @@ function zeigeStartseite() {
         musikschule appenzeller mittelland
       </div>
       <h1>${begruessung}</h1>
-      <p>Wähle ein Kapitel aus und sammle Sterne!</p>
+      <p>Wähle eine Stufe und ein Kapitel aus, um Sterne zu sammeln!</p>
       ${typeof baueMsamStatusLeiste === "function" ? baueMsamStatusLeiste() : ""}
     </div>
-    <div class="chapters-grid">${kartenHTML}</div>`;
+    ${stufenHTML}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
