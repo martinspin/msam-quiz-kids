@@ -364,7 +364,7 @@ window.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(link);
   }
 });
-// === AUTOMATISCHER CLOUD-ABRUF IN LADEFORTSCHRITT() BEIM ANMELDEN ===
+// === AUTOMATISCHER CLOUD-ABRUF IN KLAVIERENTDECKERFORTSCHRITT BEIM ANMELDEN ===
 (function () {
   const originalSpeichereLogin = window.speichereMsamLogin;
   if (typeof originalSpeichereLogin !== "function") return;
@@ -388,24 +388,15 @@ window.addEventListener("DOMContentLoaded", () => {
         const neueSterne = Math.max(Number(daten.sterne || 0), cloudSterne);
         const neueErledigt = Array.from(new Set([...lokalErledigt, ...cloudErledigt]));
 
-        if (neueSterne > (daten.sterne || 0) || neueErledigt.length > lokalErledigt.length) {
-          daten.sterne = neueSterne;
-          daten.erledigt = neueErledigt;
+        daten.sterne = neueSterne;
+        daten.erledigt = neueErledigt;
 
-          // Fortschritt im localStorage speichern (egal wie der Key exakt heisst)
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            const val = localStorage.getItem(key) || "";
-            if (val.includes('"sterne"') && val.includes('"erledigt"')) {
-              localStorage.setItem(key, JSON.stringify(daten));
-              break;
-            }
-          }
+        // Direkt unter dem exakten Schlüssel "klavierEntdeckerFortschritt" speichern!
+        localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(daten));
 
-          // Oberfläche sofort mit den geladenen Sternen neu zeichnen
-          if (typeof aktualisiereHeader === "function") aktualisiereHeader();
-          if (typeof zeigeStartseite === "function") zeigeStartseite();
-        }
+        // Oberfläche sofort neu zeichnen, damit die geladenen Sterne & Häkchen sichtbar sind
+        if (typeof aktualisiereHeader === "function") aktualisiereHeader();
+        if (typeof zeigeStartseite === "function") zeigeStartseite();
       }
     } catch (e) {
       console.warn("Cloud-Abruf beim Login fehlgeschlagen:", e);
