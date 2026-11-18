@@ -451,7 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
     baueTierLeiste();
   }
 })();
-// Automatischer "Abmelden"-Button für Schülerwechsel auf dem iPad/Computer
+/// Automatischer "Abmelden"-Button für Schülerwechsel auf dem iPad/Computer
 (function aktiviereAbmeldenButton() {
   function fuegeAbmeldenHinzu() {
     if (document.getElementById("msam-logout-btn")) return;
@@ -466,20 +466,18 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       if (!confirm("Möchtest du dich wirklich abmelden?")) return;
 
-      if (typeof abmelden === "function") {
-        abmelden();
-        return;
-      }
-      if (typeof logout === "function") {
-        logout();
-        return;
-      }
+      // 1. Fortschritt des bisherigen Schülers lokal leeren (in Firebase bleibt er sicher!)
+      localStorage.removeItem("klavierEntdeckerFortschritt");
 
+      // 2. Alle Profil- & Login-Schlüssel aus dem localStorage entfernen
       Object.keys(localStorage).forEach((key) => {
-        if (key.toLowerCase().includes("user") || key.toLowerCase().includes("login") || key.toLowerCase().includes("name") || key.toLowerCase().includes("schueler")) {
+        const k = key.toLowerCase();
+        if (k.includes("msam") || k.includes("profil") || k.includes("user") || k.includes("login") || k.includes("name") || k.includes("schueler")) {
           localStorage.removeItem(key);
         }
       });
+
+      // 3. Seite neu laden, damit die Anmeldung sauber für das nächste Kind erscheint
       location.reload();
     });
 
@@ -492,6 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fuegeAbmeldenHinzu();
   }
 })();
+
 // Eigener Spielstand (Sterne, Spiele & Tiere) pro Schülername
 (function trenneSpielstandNachName() {
   function holeAktuellenNamen() {
