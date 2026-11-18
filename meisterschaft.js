@@ -8,46 +8,35 @@ async function msamSafeFirestorePatch(profil, body) {
   const docUrl = `${MSAM_FIRESTORE_URL}/${encodeURIComponent(profil.id)}`;
 
   try {
-    // 1. Vor dem Überschreiben immer zuerst den aktuellen Stand aus Firebase abrufen
     const getRes = await fetch(docUrl);
     if (getRes.ok && body && body.fields) {
       const cloudJson = await getRes.json();
       const cf = cloudJson.fields || {};
 
-      // Höhere Sterne aus Cloud oder lokal behalten (niemals zurück auf 0 setzen!)
+      // 1. Höhere Sterne behalten
       const cloudSterne = Number(cf.sterne?.integerValue || cf.sterne?.doubleValue || 0);
-      const lokalSterne = Number(body.fields.sterne?.integerValue || body.fields.sterne?.doubleValue || 0);
+      const lokalSterne = Number(body.fields.sterne?.integerValue || 0);
       const maxSterne = Math.max(cloudSterne, lokalSterne);
+      body.fields.sterne = { integerValue: String(maxSterne) };
 
-      if (body.fields.sterne) {
-        body.fields.sterne = { integerValue: String(maxSterne) };
-      }
-      if (typeof profil.sterne === "number") {
-        profil.sterne = maxSterne;
-      }
+      // 2. Gelöste Aufgaben-Liste (erledigt) vereinigen
+      const cloudErledigt = (cf.erledigt?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
+      const lokalErledigt = (body.fields.erledigt?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
+      const vereintErledigt = Array.from(new Set([...cloudErledigt, ...lokalErledigt]));
 
-      // Gelöste Aufgaben (erledigt / abgeschlossen) aus Cloud + lokal vereinigen
-      const listeFeld = body.fields.erledigt ? "erledigt" : (body.fields.abgeschlossen ? "abgeschlossen" : null);
-      if (listeFeld && cf[listeFeld]?.arrayValue?.values) {
-        const cloudListe = cf[listeFeld].arrayValue.values.map((v) => v.stringValue).filter(Boolean);
-        const lokalListe = (body.fields[listeFeld]?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
-        const vereint = Array.from(new Set([...cloudListe, ...lokalListe]));
+      body.fields.erledigt = {
+        arrayValue: { values: vereintErledigt.map((id) => ({ stringValue: id })) }
+      };
 
-        body.fields[listeFeld] = {
-          arrayValue: {
-            values: vereint.map((id) => ({ stringValue: id }))
-          }
-        };
-        if (Array.isArray(profil[listeFeld])) {
-          profil[listeFeld] = vereint;
-        }
-      }
+      // 3. Höhere erledigtAnzahl behalten
+      const cloudAnzahl = Number(cf.erledigtAnzahl?.integerValue || 0);
+      const maxAnzahl = Math.max(cloudAnzahl, vereintErledigt.length, Number(body.fields.erledigtAnzahl?.integerValue || 0));
+      body.fields.erledigtAnzahl = { integerValue: String(maxAnzahl) };
     }
   } catch (e) {
     console.warn("Firebase Vorab-Check übersprungen:", e);
   }
 
-  // 2. Erst jetzt sicher mit den zusammengeführten Werten speichern
   return fetch(docUrl, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -55,68 +44,12 @@ async function msamSafeFirestorePatch(profil, body) {
   });
 }
 
-
-const MSAM_LEHRPERSONEN = Array.of(
-  { id: "lp_andriescu", name: "Emanuel Andriescu", pin: "2101" },
-  { id: "lp_boelingen", name: "Stéphane Bölingen", pin: "2102" },
-  { id: "lp_buechel", name: "Eliane Büchel", pin: "2103" },
-  { id: "lp_casareale", name: "Mathieu Casareale", pin: "2104" },
-  { id: "lp_cerpelloni", name: "Enrico Cerpelloni", pin: "2105" },
-  { id: "lp_engel", name: "Manuela Engel", pin: "2106" },
-  { id: "lp_fleten", name: "Sarah Fleten", pin: "2107" },
-  { id: "lp_fronczak", name: "Anna Fronczak", pin: "2108" },
-  { id: "lp_graf", name: "Albert Graf", pin: "2109" },
-  { id: "lp_haag", name: "Hiroko Haag", pin: "2110" },
-  { id: "lp_heim", name: "Alessia Heim", pin: "2111" },
-  { id: "lp_horvath", name: "Kinga Horvath", pin: "2112" },
-  { id: "lp_kessler", name: "Patrick Kessler", pin: "2113" },
-  { id: "lp_knight", name: "Knight Eun-Joo", pin: "2114" },
-  { id: "lp_knobel", name: "Jasmin Knobel", pin: "2115" },
-  { id: "lp_krueger", name: "Olaf Krüger", pin: "2116" },
-  { id: "lp_kueng", name: "Clarigna Küng", pin: "2117" },
-  { id: "lp_loewe", name: "Livia Loewe", pin: "2118" },
-  { id: "lp_magsam", name: "Dieter Magsam", pin: "2119" },
-  { id: "lp_mantovani", name: "Claudia Mantovani", pin: "2120" },
-  { id: "lp_pabst", name: "Thorsten Pabst", pin: "2121" },
-  { id: "lp_popp", name: "Adrian Popp", pin: "2122" },
-  { id: "lp_raymann", name: "Franziska Raymann", pin: "2123" },
-  { id: "lp_riegg", name: "Sissi Riegg", pin: "2124" },
-  { id: "lp_sailer", name: "Frida Sailer", pin: "2125" },
-  { id: "lp_salvatti", name: "Milena Salvatti", pin: "2126" },
-  { id: "lp_samoriezov", name: "Oleksii Samoriezov", pin: "2127" },
-  { id: "lp_schwedes", name: "Rüdiger Schwedes", pin: "2128" },
-  { id: "lp_senn", name: "Martin Senn", pin: "1111" },
-  { id: "lp_spaltenstein", name: "Aline Spaltenstein", pin: "2130" },
-  { id: "lp_stefanov", name: "Krasimir Stefanov", pin: "2131" },
-  { id: "lp_stefanova", name: "Mihaela Stefanova", pin: "2132" },
-  { id: "lp_ternova", name: "Alla Ternova", pin: "2133" },
-  { id: "lp_tschopp_d", name: "Dionys Tschopp", pin: "2134" },
-  { id: "lp_tschopp_l", name: "Linus Tschopp", pin: "2135" },
-  { id: "lp_wahl", name: "Wolfgang Wahl", pin: "2136" },
-  { id: "lp_weber", name: "Sari Weber", pin: "2137" },
-  { id: "lp_weiss", name: "Regula Weiss", pin: "2138" },
-  { id: "lp_weniger", name: "Daniel Weniger", pin: "2139" },
-  { id: "lp_weyrich", name: "Ute Weyrich", pin: "2140" }
-);
-
-function ladeMsamProfil() {
-  try {
-    const roh = localStorage.getItem("msamSchuelerProfil");
-    if (roh) return JSON.parse(roh);
-  } catch (e) {}
-  return null;
-}
-
-function speichereMsamProfil(profil) {
-  try {
-    localStorage.setItem("msamSchuelerProfil", JSON.stringify(profil));
-  } catch (e) {}
-}
-
 async function synchronisiereFortschrittMitCloud() {
   const profil = ladeMsamProfil();
   if (!profil) return;
   const daten = ladeFortschritt();
+  const erledigtListe = Array.isArray(daten.erledigt) ? daten.erledigt : [];
+
   const body = {
     fields: {
       vorname: { stringValue: profil.vorname },
@@ -124,12 +57,12 @@ async function synchronisiereFortschrittMitCloud() {
       lehrpersonId: { stringValue: profil.lehrpersonId },
       lehrpersonName: { stringValue: profil.lehrpersonName },
       sterne: { integerValue: String(daten.sterne || 0) },
-      erledigtAnzahl: { integerValue: String(daten.erledigt.length || 0) },
+      erledigtAnzahl: { integerValue: String(erledigtListe.length || 0) },
+      erledigt: { arrayValue: { values: erledigtListe.map((id) => ({ stringValue: String(id) })) } },
       letztesSpiel: { stringValue: new Date().toISOString() }
     }
   };
-await msamSafeFirestorePatch(profil, body);
-
+  await msamSafeFirestorePatch(profil, body);
 }
 
 async function ladeAlleMsamSchuelerAusCloud() {
@@ -431,3 +364,53 @@ window.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(link);
   }
 });
+// === AUTOMATISCHER CLOUD-ABRUF IN LADEFORTSCHRITT() BEIM ANMELDEN ===
+(function () {
+  const originalSpeichereLogin = window.speichereMsamLogin;
+  if (typeof originalSpeichereLogin !== "function") return;
+
+  window.speichereMsamLogin = async function (...args) {
+    const ergebnis = await originalSpeichereLogin.apply(this, args);
+
+    try {
+      const profil = typeof ladeMsamProfil === "function" ? ladeMsamProfil() : null;
+      if (!profil || !profil.id || typeof ladeFortschritt !== "function") return ergebnis;
+
+      const res = await fetch(`${MSAM_FIRESTORE_URL}/${encodeURIComponent(profil.id)}`);
+      if (res.ok) {
+        const doc = await res.json();
+        const f = doc.fields || {};
+        const cloudSterne = Number(f.sterne?.integerValue || f.sterne?.doubleValue || 0);
+        const cloudErledigt = (f.erledigt?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
+
+        const daten = ladeFortschritt();
+        const lokalErledigt = Array.isArray(daten.erledigt) ? daten.erledigt : [];
+        const neueSterne = Math.max(Number(daten.sterne || 0), cloudSterne);
+        const neueErledigt = Array.from(new Set([...lokalErledigt, ...cloudErledigt]));
+
+        if (neueSterne > (daten.sterne || 0) || neueErledigt.length > lokalErledigt.length) {
+          daten.sterne = neueSterne;
+          daten.erledigt = neueErledigt;
+
+          // Fortschritt im localStorage speichern (egal wie der Key exakt heisst)
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            const val = localStorage.getItem(key) || "";
+            if (val.includes('"sterne"') && val.includes('"erledigt"')) {
+              localStorage.setItem(key, JSON.stringify(daten));
+              break;
+            }
+          }
+
+          // Oberfläche sofort mit den geladenen Sternen neu zeichnen
+          if (typeof aktualisiereHeader === "function") aktualisiereHeader();
+          if (typeof zeigeStartseite === "function") zeigeStartseite();
+        }
+      }
+    } catch (e) {
+      console.warn("Cloud-Abruf beim Login fehlgeschlagen:", e);
+    }
+
+    return ergebnis;
+  };
+})();
