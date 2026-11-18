@@ -451,7 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
     baueTierLeiste();
   }
 })();
-/// Automatischer "Abmelden"-Button für Schülerwechsel auf dem iPad/Computer
+// Automatischer "Abmelden"-Button für Schülerwechsel auf dem iPad/Computer
 (function aktiviereAbmeldenButton() {
   function fuegeAbmeldenHinzu() {
     if (document.getElementById("msam-logout-btn")) return;
@@ -466,10 +466,10 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       if (!confirm("Möchtest du dich wirklich abmelden?")) return;
 
-      // 1. Fortschritt des bisherigen Schülers lokal leeren (in Firebase bleibt er sicher!)
+      // 1. Lokalen Fortschritt entfernen (in Firebase bleibt er sicher!)
       localStorage.removeItem("klavierEntdeckerFortschritt");
 
-      // 2. Alle Profil- & Login-Schlüssel aus dem localStorage entfernen
+      // 2. Alle Profil- & Login-Einträge sicher aus dem localStorage löschen
       Object.keys(localStorage).forEach((key) => {
         const k = key.toLowerCase();
         if (k.includes("msam") || k.includes("profil") || k.includes("user") || k.includes("login") || k.includes("name") || k.includes("schueler")) {
@@ -477,7 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      // 3. Seite neu laden, damit die Anmeldung sauber für das nächste Kind erscheint
+      // 3. Seite direkt neu laden, damit die Anmeldung sauber erscheint
       location.reload();
     });
 
