@@ -116,10 +116,13 @@ async function msamSafeFirestorePatch(profil, body) {
     const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
     lokal.sterne = finalSterne;
     lokal.erledigt = finalErledigt;
-    localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(lokal));
+        localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(lokal));
+    const starEl = document.getElementById("star-count");
+    if (starEl) starEl.textContent = String(finalSterne);
     if (typeof aktualisiereSterneAnzeige === "function") {
       aktualisiereSterneAnzeige();
     }
+
   } catch (e) {}
 
   return fetch(docUrl, {
