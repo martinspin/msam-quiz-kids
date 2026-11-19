@@ -111,9 +111,9 @@ async function msamSafeFirestorePatch(profil, body) {
     console.warn("Firebase Vorab-Check übersprungen:", e);
   }
 
-  // Vereinigte Daten direkt lokal speichern und Anzeige aktualisieren (ohne Endlosschleife)
+  // Vereinigte Daten direkt lokal speichern und Anzeige aktualisieren
   try {
-    const lokal = ladeFortschritt();
+    const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
     lokal.sterne = finalSterne;
     lokal.erledigt = finalErledigt;
     localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(lokal));
@@ -210,6 +210,12 @@ window.speichereMsamLogin = async () => {
   const lpObj = MSAM_LEHRPERSONEN.find((l) => l.id === lpId) || MSAM_LEHRPERSONEN.at(0);
   const schuelerId = `${vorname.toLowerCase()}_${nachname.toLowerCase()}_${lpObj.id}`.replace(/[^a-z0-9_]/g, "");
 
+  // Lokalen Stand nur zurücksetzen, wenn sich ein anderer Schüler anmeldet
+  const altesProfil = ladeMsamProfil();
+  if (!altesProfil || altesProfil.id !== schuelerId) {
+    localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify({ sterne: 0, erledigt: [] }));
+  }
+
   speichereMsamProfil({
     id: schuelerId,
     vorname,
@@ -223,6 +229,7 @@ window.speichereMsamLogin = async () => {
   } catch (e) {
     console.warn("Cloud-Sync Fehler:", e);
   }
+  if (typeof aktualisiereSterneAnzeige === "function") aktualisiereSterneAnzeige();
   zeigeStartseite();
 };
 
@@ -428,42 +435,3 @@ window.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(link);
   }
 });
-// === AUTOMATISCHER CLOUD-ABRUF IN KLAVIERENTDECKERFORTSCHRITT BEIM ANMELDEN ===
-(function () {
-  const originalSpeichereLogin = window.speichereMsamLogin;
-  if (typeof originalSpeichereLogin !== "function") return;
-
-  window.speichereMsamLogin = async function (...args) {
-    const ergebnis = await originalSpeichereLogin.apply(this, args);
-
-    try {
-      const profil = typeof ladeMsamProfil === "function" ? ladeMsamProfil() : null;
-      if (!profil || !profil.id || typeof ladeFortschritt !== "function") return ergebnis;
-
-      const res = await fetch(`${MSAM_FIRESTORE_URL}/${encodeURIComponent(profil.id)}`);
-      if (res.ok) {
-        const doc = await res.json();
-        const f = doc.fields || {};
-        const cloudSterne = Number(f.sterne?.integerValue || f.sterne?.doubleValue || 0);
-        const cloudErledigt = (f.erledigt?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
-
-        const daten = ladeFortschritt();
-        const lokalErledigt = Array.isArray(daten.erledigt) ? daten.erledigt : [];
-        const neueSterne = Math.max(Number(daten.sterne || 0), cloudSterne);
-        const neueErledigt = Array.from(new Set([...lokalErledigt, ...cloudErledigt]));
-
-        daten.sterne = neueSterne;
-        daten.erledigt = neueErledigt;
-
-        localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(daten));
-
-        if (typeof aktualisiereSterneAnzeige === "function") aktualisiereSterneAnzeige();
-        if (typeof zeigeStartseite === "function") zeigeStartseite();
-      }
-    } catch (e) {
-      console.warn("Cloud-Abruf beim Login fehlgeschlagen:", e);
-    }
-
-    return ergebnis;
-  };
-})();
