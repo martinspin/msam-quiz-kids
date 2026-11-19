@@ -453,3 +453,16 @@ window.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(link);
   }
 });
+// === STERNE-ANZEIGE BEIM SEITENSTART GARANTIEREN ===
+window.addEventListener("DOMContentLoaded", () => {
+  try {
+    const roh = localStorage.getItem("klavierEntdeckerFortschritt");
+    if (roh) {
+      const daten = JSON.parse(roh);
+      const starEl = document.getElementById("star-count");
+      if (starEl && typeof daten.sterne === "number") {
+        starEl.textContent = String(daten.sterne);
+      }
+    }
+  } catch (e) {}
+});
