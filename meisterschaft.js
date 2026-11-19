@@ -112,7 +112,7 @@ async function msamSafeFirestorePatch(profil, body) {
     const key = typeof speicherSchluessel === "function" ? speicherSchluessel() : "klavierEntdeckerFortschritt";
     const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
     lokal.sterne = finalSterne;
-    lokal.erledigt = finalErledigt;
+        lokal.erledigt = finalErledigt;
     localStorage.setItem(key, JSON.stringify(lokal));
     const starEl = document.getElementById("star-count");
     if (starEl) starEl.textContent = String(finalSterne);
@@ -128,29 +128,7 @@ async function msamSafeFirestorePatch(profil, body) {
   });
 }
 
-
-// Vereinigte Daten direkt unter dem echten speicherSchluessel() speichern und Anzeige aktualisieren
-  try {
-    const key = typeof speicherSchluessel === "function" ? speicherSchluessel() : "klavierEntdeckerFortschritt";
-    const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
-    lokal.sterne = finalSterne;
-    lokal.erledigt = finalErledigt;
-    localStorage.setItem(key, JSON.stringify(lokal));
-    const starEl = document.getElementById("star-count");
-    if (starEl) starEl.textContent = String(finalSterne);
-    if (typeof aktualisiereSterneAnzeige === "function") {
-      aktualisiereSterneAnzeige();
-    }
-  } catch (e) {}
-
-  return fetch(docUrl, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-
 async function synchronisiereFortschrittMitCloud() {
-
   const profil = ladeMsamProfil();
   if (!profil) return;
   const daten = ladeFortschritt();
