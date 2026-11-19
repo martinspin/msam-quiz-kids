@@ -56,6 +56,10 @@ function ladeMsamProfil() {
     return null;
   }
 }
+  const altesProfil = ladeMsamProfil();
+  if (!altesProfil || altesProfil.id !== schuelerId) {
+    localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify({ sterne: 0, erledigt: [] }));
+  }
 
 function speichereMsamProfil(profil) {
   try {
@@ -76,6 +80,8 @@ function baueMsamStatusLeiste() {
 
 async function msamSafeFirestorePatch(profil, body) {
   const docUrl = `${MSAM_FIRESTORE_URL}/${encodeURIComponent(profil.id)}`;
+  let finalSterne = Number(body.fields.sterne?.integerValue || 0);
+  let finalErledigt = (body.fields.erledigt?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
 
   try {
     const getRes = await fetch(docUrl);
@@ -85,54 +91,42 @@ async function msamSafeFirestorePatch(profil, body) {
 
       // 1. Höhere Sterne behalten
       const cloudSterne = Number(cf.sterne?.integerValue || cf.sterne?.doubleValue || 0);
-      const lokalSterne = Number(body.fields.sterne?.integerValue || 0);
-      const maxSterne = Math.max(cloudSterne, lokalSterne);
-      body.fields.sterne = { integerValue: String(maxSterne) };
+      finalSterne = Math.max(cloudSterne, finalSterne);
+      body.fields.sterne = { integerValue: String(finalSterne) };
 
       // 2. Gelöste Aufgaben-Liste (erledigt) vereinigen
       const cloudErledigt = (cf.erledigt?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
-      const lokalErledigt = (body.fields.erledigt?.arrayValue?.values || []).map((v) => v.stringValue).filter(Boolean);
-      const vereintErledigt = Array.from(new Set([...cloudErledigt, ...lokalErledigt]));
+      finalErledigt = Array.from(new Set([...cloudErledigt, ...finalErledigt]));
 
       body.fields.erledigt = {
-        arrayValue: { values: vereintErledigt.map((id) => ({ stringValue: id })) }
+        arrayValue: { values: finalErledigt.map((id) => ({ stringValue: id })) }
       };
 
       // 3. Höhere erledigtAnzahl behalten
       const cloudAnzahl = Number(cf.erledigtAnzahl?.integerValue || 0);
-      const maxAnzahl = Math.max(cloudAnzahl, vereintErledigt.length, Number(body.fields.erledigtAnzahl?.integerValue || 0));
+      const maxAnzahl = Math.max(cloudAnzahl, finalErledigt.length, Number(body.fields.erledigtAnzahl?.integerValue || 0));
       body.fields.erledigtAnzahl = { integerValue: String(maxAnzahl) };
     }
   } catch (e) {
     console.warn("Firebase Vorab-Check übersprungen:", e);
   }
 
+  // Vereinigte Daten direkt lokal speichern und Anzeige aktualisieren (ohne Endlosschleife)
+  try {
+    const lokal = ladeFortschritt();
+    lokal.sterne = finalSterne;
+    lokal.erledigt = finalErledigt;
+    localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(lokal));
+    if (typeof aktualisiereSterneAnzeige === "function") {
+      aktualisiereSterneAnzeige();
+    }
+  } catch (e) {}
+
   return fetch(docUrl, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
   });
-}
-
-async function synchronisiereFortschrittMitCloud() {
-  const profil = ladeMsamProfil();
-  if (!profil) return;
-  const daten = ladeFortschritt();
-  const erledigtListe = Array.isArray(daten.erledigt) ? daten.erledigt : [];
-
-  const body = {
-    fields: {
-      vorname: { stringValue: profil.vorname },
-      nachname: { stringValue: profil.nachname },
-      lehrpersonId: { stringValue: profil.lehrpersonId },
-      lehrpersonName: { stringValue: profil.lehrpersonName },
-      sterne: { integerValue: String(daten.sterne || 0) },
-      erledigtAnzahl: { integerValue: String(erledigtListe.length || 0) },
-      erledigt: { arrayValue: { values: erledigtListe.map((id) => ({ stringValue: String(id) })) } },
-      letztesSpiel: { stringValue: new Date().toISOString() }
-    }
-  };
-  await msamSafeFirestorePatch(profil, body);
 }
 
 async function ladeAlleMsamSchuelerAusCloud() {
@@ -461,11 +455,9 @@ window.addEventListener("DOMContentLoaded", () => {
         daten.sterne = neueSterne;
         daten.erledigt = neueErledigt;
 
-        // Direkt unter dem exakten Schlüssel "klavierEntdeckerFortschritt" speichern!
         localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify(daten));
 
-        // Oberfläche sofort neu zeichnen, damit die geladenen Sterne & Häkchen sichtbar sind
-        if (typeof aktualisiereHeader === "function") aktualisiereHeader();
+        if (typeof aktualisiereSterneAnzeige === "function") aktualisiereSterneAnzeige();
         if (typeof zeigeStartseite === "function") zeigeStartseite();
       }
     } catch (e) {
