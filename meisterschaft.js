@@ -107,6 +107,27 @@ async function msamSafeFirestorePatch(profil, body) {
     console.warn("Firebase Vorab-Check übersprungen:", e);
   }
 
+  // Vereinigte Daten direkt unter dem echten speicherSchluessel() speichern
+  try {
+    const key = typeof speicherSchluessel === "function" ? speicherSchluessel() : "klavierEntdeckerFortschritt";
+    const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
+    lokal.sterne = finalSterne;
+    lokal.erledigt = finalErledigt;
+    localStorage.setItem(key, JSON.stringify(lokal));
+    const starEl = document.getElementById("star-count");
+    if (starEl) starEl.textContent = String(finalSterne);
+    if (typeof aktualisiereSterneAnzeige === "function") {
+      aktualisiereSterneAnzeige();
+    }
+  } catch (e) {}
+
+  return fetch(docUrl, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+}
+
   // Vereinigte Daten direkt lokal speichern und Anzeige aktualisieren
   try {
     const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
@@ -126,7 +147,6 @@ async function msamSafeFirestorePatch(profil, body) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
   });
-}
 async function synchronisiereFortschrittMitCloud() {
   const profil = ladeMsamProfil();
   if (!profil) return;
@@ -228,12 +248,6 @@ window.speichereMsamLogin = async () => {
   const lpObj = MSAM_LEHRPERSONEN.find((l) => l.id === lpId) || MSAM_LEHRPERSONEN.at(0);
   const schuelerId = `${vorname.toLowerCase()}_${nachname.toLowerCase()}_${lpObj.id}`.replace(/[^a-z0-9_]/g, "");
 
-  // Lokalen Stand nur zurücksetzen, wenn sich ein anderer Schüler anmeldet
-  const altesProfil = ladeMsamProfil();
-  if (!altesProfil || altesProfil.id !== schuelerId) {
-    localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify({ sterne: 0, erledigt: [] }));
-  }
-
   speichereMsamProfil({
     id: schuelerId,
     vorname,
@@ -250,63 +264,6 @@ window.speichereMsamLogin = async () => {
   if (typeof aktualisiereSterneAnzeige === "function") aktualisiereSterneAnzeige();
   zeigeStartseite();
 };
-
-async function zeigeMsamRangliste(nurMeineKlasse = false) {
-  const profil = ladeMsamProfil();
-  document.getElementById("main-content").innerHTML = `
-    <div class="card" style="text-align:center;">
-      <h2>🏆 <span style="text-transform:lowercase;">msam quiz kids</span> – Rangliste</h2>
-      <p class="quiz-hint">Lade aktuelle Punktestände...</p>
-    </div>`;
-
-  let teilnehmer = Array.of();
-  try {
-    teilnehmer = await ladeAlleMsamSchuelerAusCloud();
-    teilnehmer.sort((a, b) => (b.sterne || 0) - (a.sterne || 0));
-  } catch (e) {
-    console.warn("Fehler beim Laden der Rangliste:", e);
-  }
-
-  if (teilnehmer.length === 0 && profil) {
-    const lokal = ladeFortschritt();
-    teilnehmer.push({ ...profil, sterne: lokal.sterne, erledigtAnzahl: lokal.erledigt.length });
-  }
-
-  if (nurMeineKlasse && profil) {
-    teilnehmer = teilnehmer.filter((t) => t.lehrpersonId === profil.lehrpersonId);
-  }
-
-  const zeilenHTML = teilnehmer.map((t, idx) => {
-    const istIch = profil && t.id === profil.id;
-    const platzIcon = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `${idx + 1}.`;
-    const anzeigeName = `${t.vorname} ${t.nachname ? t.nachname.charAt(0) + "." : ""}`;
-    return `
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-radius:14px; margin-bottom:8px;
-                  background:${istIch ? "#fef3c7" : "#f8fafc"}; border:2px solid ${istIch ? "#f59e0b" : "#e2e8f0"};">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:20px; font-weight:900; min-width:34px;">${platzIcon}</span>
-          <div style="text-align:left;">
-            <div style="font-weight:900; font-size:16px;">${anzeigeName} ${istIch ? "(Du! ⭐)" : ""}</div>
-            <div style="font-size:12px; color:#64748b;">${t.lehrpersonName} • ${t.erledigtAnzahl || 0} / 30 Spiele</div>
-          </div>
-        </div>
-        <div style="font-weight:900; font-size:18px; color:#b45309;">${t.sterne || 0} ⭐</div>
-      </div>`;
-  }).join("");
-
-  document.getElementById("main-content").innerHTML = `
-    <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-        <h2 style="margin:0;">🏆 <span style="text-transform:lowercase;">msam quiz kids</span> – Rangliste</h2>
-        <button class="btn-ghost" onclick="zeigeStartseite()">← Zurück</button>
-      </div>
-      <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
-        <button class="${!nurMeineKlasse ? "btn-primary" : "btn-ghost"}" onclick="zeigeMsamRangliste(false)">Alle <span style="text-transform:lowercase;">msam</span> Kids</button>
-        <button class="${nurMeineKlasse ? "btn-primary" : "btn-ghost"}" onclick="zeigeMsamRangliste(true)">Meine Klasse</button>
-      </div>
-      <div>${zeilenHTML || "<p>Noch keine Einträge vorhanden.</p>"}</div>
-    </div>`;
-}
 
 function zeigeMsamLehrpersonenLogin() {
   const lpOptionen = MSAM_LEHRPERSONEN.map((lp) => `<option value="${lp.id}">${lp.name}</option>`).join("");
