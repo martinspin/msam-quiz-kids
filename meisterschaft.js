@@ -128,7 +128,26 @@ async function msamSafeFirestorePatch(profil, body) {
     body: JSON.stringify(body)
   });
 }
+async function synchronisiereFortschrittMitCloud() {
+  const profil = ladeMsamProfil();
+  if (!profil) return;
+  const daten = ladeFortschritt();
+  const erledigtListe = Array.isArray(daten.erledigt) ? daten.erledigt : [];
 
+  const body = {
+    fields: {
+      vorname: { stringValue: profil.vorname },
+      nachname: { stringValue: profil.nachname },
+      lehrpersonId: { stringValue: profil.lehrpersonId },
+      lehrpersonName: { stringValue: profil.lehrpersonName },
+      sterne: { integerValue: String(daten.sterne || 0) },
+      erledigtAnzahl: { integerValue: String(erledigtListe.length || 0) },
+      erledigt: { arrayValue: { values: erledigtListe.map((id) => ({ stringValue: String(id) })) } },
+      letztesSpiel: { stringValue: new Date().toISOString() }
+    }
+  };
+  await msamSafeFirestorePatch(profil, body);
+}
 async function ladeAlleMsamSchuelerAusCloud() {
   const res = await fetch(`${MSAM_FIRESTORE_URL}?pageSize=200`);
   if (!res.ok) {
