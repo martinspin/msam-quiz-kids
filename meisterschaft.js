@@ -56,10 +56,6 @@ function ladeMsamProfil() {
     return null;
   }
 }
-  const altesProfil = ladeMsamProfil();
-  if (!altesProfil || altesProfil.id !== schuelerId) {
-    localStorage.setItem("klavierEntdeckerFortschritt", JSON.stringify({ sterne: 0, erledigt: [] }));
-  }
 
 function speichereMsamProfil(profil) {
   try {
