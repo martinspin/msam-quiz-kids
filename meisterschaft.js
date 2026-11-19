@@ -107,7 +107,7 @@ async function msamSafeFirestorePatch(profil, body) {
     console.warn("Firebase Vorab-Check übersprungen:", e);
   }
 
-  // Vereinigte Daten direkt unter dem echten speicherSchluessel() speichern
+    // Vereinigte Daten direkt unter dem echten speicherSchluessel() speichern
   try {
     const key = typeof speicherSchluessel === "function" ? speicherSchluessel() : "klavierEntdeckerFortschritt";
     const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
@@ -127,6 +127,7 @@ async function msamSafeFirestorePatch(profil, body) {
     body: JSON.stringify(body)
   });
 }
+
 
   // Vereinigte Daten direkt lokal speichern und Anzeige aktualisieren
   try {
