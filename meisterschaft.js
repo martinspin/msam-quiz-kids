@@ -47,7 +47,6 @@ const MSAM_LEHRPERSONEN = Array.of(
   { id: "wolfgang_wahl", name: "Wolfgang Wahl (Drums)", pin: "1040" }
 );
 
-
 function ladeMsamProfil() {
   try {
     const roh = localStorage.getItem("msamSchuelerProfil");
@@ -107,13 +106,27 @@ async function msamSafeFirestorePatch(profil, body) {
     console.warn("Firebase Vorab-Check übersprungen:", e);
   }
 
-    // Vereinigte Daten direkt unter dem echten speicherSchluessel() speichern
+  // Vereinigte Daten unter allen verwendeten Speicherschlüsseln dieses Profils sichern
   try {
-    const key = typeof speicherSchluessel === "function" ? speicherSchluessel() : "klavierEntdeckerFortschritt";
-    const lokal = typeof ladeFortschritt === "function" ? ladeFortschritt() : { sterne: 0, erledigt: [] };
-    lokal.sterne = finalSterne;
-        lokal.erledigt = finalErledigt;
-    localStorage.setItem(key, JSON.stringify(lokal));
+    const schluesselListe = new Set([
+      "klavierEntdeckerFortschritt",
+      `msam_quizkids_stand_${profil.id}`
+    ]);
+    if (typeof speicherSchluessel === "function") {
+      schluesselListe.add(speicherSchluessel());
+    }
+
+    schluesselListe.forEach((key) => {
+      let lokal = { sterne: 0, erledigt: [] };
+      try {
+        const roh = localStorage.getItem(key);
+        if (roh) lokal = JSON.parse(roh);
+      } catch (e) {}
+      lokal.sterne = finalSterne;
+      lokal.erledigt = finalErledigt;
+      localStorage.setItem(key, JSON.stringify(lokal));
+    });
+
     const starEl = document.getElementById("star-count");
     if (starEl) starEl.textContent = String(finalSterne);
     if (typeof aktualisiereSterneAnzeige === "function") {
@@ -131,8 +144,31 @@ async function msamSafeFirestorePatch(profil, body) {
 async function synchronisiereFortschrittMitCloud() {
   const profil = ladeMsamProfil();
   if (!profil) return;
-  const daten = ladeFortschritt();
-  const erledigtListe = Array.isArray(daten.erledigt) ? daten.erledigt : [];
+
+  let lokaleSterne = 0;
+  let lokaleErledigt = [];
+  const leseSchluessel = [
+    `msam_quizkids_stand_${profil.id}`,
+    "klavierEntdeckerFortschritt"
+  ];
+  if (typeof speicherSchluessel === "function") {
+    leseSchluessel.unshift(speicherSchluessel());
+  }
+
+  leseSchluessel.forEach((key) => {
+    try {
+      const roh = localStorage.getItem(key);
+      if (roh) {
+        const parsed = JSON.parse(roh);
+        if (typeof parsed.sterne === "number" && parsed.sterne > lokaleSterne) {
+          lokaleSterne = parsed.sterne;
+        }
+        if (Array.isArray(parsed.erledigt)) {
+          lokaleErledigt = Array.from(new Set([...lokaleErledigt, ...parsed.erledigt]));
+        }
+      }
+    } catch (e) {}
+  });
 
   const body = {
     fields: {
@@ -140,14 +176,15 @@ async function synchronisiereFortschrittMitCloud() {
       nachname: { stringValue: profil.nachname },
       lehrpersonId: { stringValue: profil.lehrpersonId },
       lehrpersonName: { stringValue: profil.lehrpersonName },
-      sterne: { integerValue: String(daten.sterne || 0) },
-      erledigtAnzahl: { integerValue: String(erledigtListe.length || 0) },
-      erledigt: { arrayValue: { values: erledigtListe.map((id) => ({ stringValue: String(id) })) } },
+      sterne: { integerValue: String(lokaleSterne) },
+      erledigtAnzahl: { integerValue: String(lokaleErledigt.length) },
+      erledigt: { arrayValue: { values: lokaleErledigt.map((id) => ({ stringValue: String(id) })) } },
       letztesSpiel: { stringValue: new Date().toISOString() }
     }
   };
   await msamSafeFirestorePatch(profil, body);
 }
+
 async function ladeAlleMsamSchuelerAusCloud() {
   const res = await fetch(`${MSAM_FIRESTORE_URL}?pageSize=200`);
   if (!res.ok) {
@@ -171,7 +208,6 @@ async function ladeAlleMsamSchuelerAusCloud() {
     };
   });
 }
-
 function zeigeMsamAnmeldung(alsModal = false) {
   const aktuellesProfil = ladeMsamProfil();
   const lpOptionen = MSAM_LEHRPERSONEN.map((lp) => {
@@ -217,6 +253,7 @@ function zeigeMsamAnmeldung(alsModal = false) {
 
   document.getElementById("main-content").innerHTML = html;
 }
+
 window.speichereMsamLogin = async () => {
   const vorname = document.getElementById("msam-vorname").value.trim();
   const nachname = document.getElementById("msam-nachname").value.trim();
@@ -274,133 +311,114 @@ window.loescheMsamSchueler = async (schuelerId, name) => {
   if (aktuellesProfil && aktuellesProfil.id === schuelerId) {
     localStorage.removeItem("msamSchuelerProfil");
     localStorage.removeItem("klavierEntdeckerFortschritt");
+    localStorage.removeItem(`msam_quizkids_stand_${schuelerId}`);
   }
   pruefeMsamLehrpersonenPin();
 };
-
-window.pruefeMsamLehrpersonenPin = async () => {
-  const lpId = document.getElementById("lp-login-id").value;
-  const pin = document.getElementById("lp-login-pin").value.trim();
-  const lp = MSAM_LEHRPERSONEN.find((l) => l.id === lpId);
-
-  if (!lp || lp.pin !== pin) {
-    document.getElementById("lp-login-fehler").textContent = "Falsche PIN! Bitte nochmals versuchen.";
-    return;
-  }
-
-  let meineSchueler = Array.of();
-  let statusMeldung = "⏳ Lade Daten...";
-
-  try {
-    const alle = await ladeAlleMsamSchuelerAusCloud();
-    meineSchueler = alle.filter((s) => s.lehrpersonId === lp.id);
-    meineSchueler.sort((a, b) => (b.sterne || 0) - (a.sterne || 0));
-    statusMeldung = "✅ Online verbunden (" + meineSchueler.length + " Einträge gefunden).";
-  } catch (e) {
-    statusMeldung = "❌ Firebase-Fehler: " + e.message;
-  }
-
-  const listeHTML = meineSchueler.map((s) => {
-    const datum = s.letztesSpiel ? new Date(s.letztesSpiel).toLocaleDateString("de-CH") : "–";
-    return `
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:2px solid #e2e8f0; border-radius:14px; margin-bottom:8px; background:#ffffff;">
-        <div style="text-align:left;">
-          <div style="font-weight:900; font-size:17px;">${s.vorname} ${s.nachname}</div>
-          <div style="font-size:13px; color:#475569;">Fortschritt: <b>${s.erledigtAnzahl || 0} / 30 Spiele</b> • Aktiv: ${datum}</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-weight:900; font-size:18px; color:#4f46e5;">${s.sterne || 0} ⭐</span>
-          <button class="btn-ghost" style="padding:6px 10px; color:#dc2626;" onclick="loescheMsamSchueler('${s.id}', '${s.vorname} ${s.nachname}')" title="Eintrag löschen">🗑️</button>
-        </div>
-      </div>`;
+function zeigeMsamAnmeldung(alsModal = false) {
+  const aktuellesProfil = ladeMsamProfil();
+  const lpOptionen = MSAM_LEHRPERSONEN.map((lp) => {
+    const sel = aktuellesProfil && aktuellesProfil.lehrpersonId === lp.id ? "selected" : "";
+    return `<option value="${lp.id}" ${sel}>${lp.name}</option>`;
   }).join("");
 
-  document.getElementById("main-content").innerHTML = `
-    <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+  const html = `
+    <div class="card" style="max-width:480px; margin:20px auto; text-align:center; border-top:6px solid #e11d48;">
+      <div style="font-size:48px;">🏆🎶</div>
+      <h2 style="margin:6px 0;"><span style="text-transform:lowercase;">msam quiz kids</span></h2>
+      <p class="quiz-hint">Gib deinen Namen ein und wähle deine Lehrperson an der <span style="text-transform:lowercase;">musikschule appenzeller mittelland</span> aus!</p>
+
+      <div style="text-align:left; margin-top:16px; display:flex; flex-direction:column; gap:12px;">
         <div>
-          <h2 style="margin:0;">📋 Klasse von ${lp.name}</h2>
-          <p style="margin:6px 0 0; font-weight:700; color:#0f172a;">${statusMeldung}</p>
+          <label style="font-weight:800; font-size:14px;">Vorname</label>
+          <input id="msam-vorname" type="text" placeholder="z. B. Mia"
+                 value="${aktuellesProfil ? aktuellesProfil.vorname : ""}"
+                 style="width:100%; padding:12px; border-radius:12px; border:2px solid #cbd5e1; font-size:16px; margin-top:4px; box-sizing:border-box;" />
         </div>
-        <button class="btn-ghost" onclick="zeigeStartseite()">← Zurück</button>
+        <div>
+          <label style="font-weight:800; font-size:14px;">Nachname</label>
+          <input id="msam-nachname" type="text" placeholder="z. B. Muster"
+                 value="${aktuellesProfil ? aktuellesProfil.nachname : ""}"
+                 style="width:100%; padding:12px; border-radius:12px; border:2px solid #cbd5e1; font-size:16px; margin-top:4px; box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-weight:800; font-size:14px;">Meine Lehrperson (<span style="text-transform:lowercase;">msam</span>)</label>
+          <select id="msam-lehrperson"
+                  style="width:100%; padding:12px; border-radius:12px; border:2px solid #cbd5e1; font-size:16px; margin-top:4px; background:#ffffff;">
+            ${lpOptionen}
+          </select>
+        </div>
       </div>
-      <div>${listeHTML || "<p>Es hat sich noch kein Schüler unter deinem Namen angemeldet.</p>"}</div>
+
+      <p id="msam-login-fehler" style="color:#dc2626; font-weight:700; margin-top:10px;"></p>
+
+      <div style="margin-top:16px; display:flex; gap:10px; justify-content:center;">
+        <button class="btn-primary" onclick="speichereMsamLogin()">Mitspielen ▶</button>
+        ${alsModal ? `<button class="btn-ghost" onclick="zeigeStartseite()">Abbrechen</button>` : ""}
+      </div>
     </div>`;
-};
-// === LEHRERCOCKPIT & SPIELSTAND-SCHUTZ (AM ENDE VON MEISTERSCHAFT.JS) ===
 
-// 1. Lehrercockpit-Ansicht (nutzt deine bestehende ladeAlleMsamSchuelerAusCloud)
-async function oeffneMsamLehrerCockpit() {
-  const pass = prompt("Lehrercockpit-Passwort eingeben:");
-  if (pass !== "msam2026") {
-    alert("Falsches Passwort.");
-    return;
-  }
-
-  const ziel = document.getElementById("app") || document.body;
-  ziel.innerHTML = `<div class="card" style="max-width:720px;margin:20px auto;text-align:center;"><h3>Lade Schülerdaten aus Firebase...</h3></div>`;
-
-  try {
-    const liste = await ladeAlleMsamSchuelerAusCloud();
-    liste.sort((a, b) => (b.sterne || 0) - (a.sterne || 0));
-
-    const zeilen = liste.map((s) => `
-      <tr style="border-bottom:1px solid #e2e8f0;">
-        <td style="padding:10px;text-align:left;font-weight:700;">${s.vorname} ${s.nachname}</td>
-        <td style="padding:10px;text-align:left;">${s.lehrpersonName || s.lehrpersonId || "-"}</td>
-        <td style="padding:10px;text-align:center;font-weight:800;">⭐ ${s.sterne || 0}</td>
-        <td style="padding:10px;text-align:center;">${s.erledigtAnzahl || 0}</td>
-        <td style="padding:10px;text-align:left;font-size:13px;">${s.letztesSpiel || "-"}</td>
-      </tr>
-    `).join("");
-
-    ziel.innerHTML = `
-      <div class="card" style="max-width:820px;margin:20px auto;border-top:6px solid #0284c7;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-          <h2 style="margin:0;">🎓 Lehrercockpit (<span style="text-transform:lowercase;">msam quiz kids</span>)</h2>
-          <button class="btn-ghost" onclick="location.reload()">Zurück zum Quiz</button>
-        </div>
-        <p style="color:#475569;">Alle registrierten Schülerinnen und Schüler (${liste.length}) sortiert nach Sternen:</p>
-        <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;margin-top:10px;">
-            <thead>
-              <tr style="background:#f1f5f9;border-bottom:2px solid #cbd5e1;">
-                <th style="padding:10px;text-align:left;">Name</th>
-                <th style="padding:10px;text-align:left;">Lehrperson</th>
-                <th style="padding:10px;text-align:center;">Sterne</th>
-                <th style="padding:10px;text-align:center;">Aufgaben</th>
-                <th style="padding:10px;text-align:left;">Letztes Spiel</th>
-              </tr>
-            </thead>
-            <tbody>${zeilen || '<tr><td colspan="5" style="padding:16px;text-align:center;">Noch keine Einträge gefunden.</td></tr>'}</tbody>
-          </table>
-        </div>
-      </div>`;
-  } catch (err) {
-    ziel.innerHTML = `<div class="card" style="max-width:600px;margin:20px auto;color:#dc2626;"><h3>Fehler beim Laden:</h3><p>${err.message}</p><button class="btn-ghost" onclick="location.reload()">Zurück</button></div>`;
-  }
+  document.getElementById("main-content").innerHTML = html;
 }
 
-// 2. Unauffälligen "Lehrercockpit"-Link automatisch unten auf der Seite einblenden
-window.addEventListener("DOMContentLoaded", () => {
-  if (!document.getElementById("msam-cockpit-link")) {
-    const link = document.createElement("div");
-    link.id = "msam-cockpit-link";
-    link.style.cssText = "text-align:center;margin:24px 0 12px 0;font-size:13px;opacity:0.65;";
-    link.innerHTML = `<a href="#" onclick="event.preventDefault(); oeffneMsamLehrerCockpit();" style="color:#475569;text-decoration:underline;">🎓 Lehrercockpit</a>`;
-    document.body.appendChild(link);
+window.speichereMsamLogin = async () => {
+  const vorname = document.getElementById("msam-vorname").value.trim();
+  const nachname = document.getElementById("msam-nachname").value.trim();
+  const lpId = document.getElementById("msam-lehrperson").value;
+
+  if (!vorname || !nachname) {
+    document.getElementById("msam-login-fehler").textContent = "Bitte Vorname und Nachname eingeben!";
+    return;
   }
-});
-// === STERNE-ANZEIGE BEIM SEITENSTART GARANTIEREN ===
-window.addEventListener("DOMContentLoaded", () => {
+  const lpObj = MSAM_LEHRPERSONEN.find((l) => l.id === lpId) || MSAM_LEHRPERSONEN.at(0);
+  const schuelerId = `${vorname.toLowerCase()}_${nachname.toLowerCase()}_${lpObj.id}`.replace(/[^a-z0-9_]/g, "");
+
+  speichereMsamProfil({
+    id: schuelerId,
+    vorname,
+    nachname,
+    lehrpersonId: lpObj.id,
+    lehrpersonName: lpObj.name
+  });
+
   try {
-    const roh = localStorage.getItem("klavierEntdeckerFortschritt");
-    if (roh) {
-      const daten = JSON.parse(roh);
-      const starEl = document.getElementById("star-count");
-      if (starEl && typeof daten.sterne === "number") {
-        starEl.textContent = String(daten.sterne);
-      }
-    }
-  } catch (e) {}
-});
+    await synchronisiereFortschrittMitCloud();
+  } catch (e) {
+    console.warn("Cloud-Sync Fehler:", e);
+  }
+  if (typeof aktualisiereSterneAnzeige === "function") aktualisiereSterneAnzeige();
+  zeigeStartseite();
+};
+
+function zeigeMsamLehrpersonenLogin() {
+  const lpOptionen = MSAM_LEHRPERSONEN.map((lp) => `<option value="${lp.id}">${lp.name}</option>`).join("");
+
+  document.getElementById("main-content").innerHTML = `
+    <div class="card" style="max-width:440px; margin:20px auto; text-align:center;">
+      <div style="font-size:44px;">👩‍🏫👨‍🏫</div>
+      <h2>Lehrpersonen-Cockpit (<span style="text-transform:lowercase;">msam</span>)</h2>
+      <p class="quiz-hint">Wähle deinen Namen und gib deine 4-stellige PIN ein.</p>
+      <select id="lp-login-id" style="width:100%; padding:12px; border-radius:12px; border:2px solid #cbd5e1; font-size:16px; margin-top:12px;">
+        ${lpOptionen}
+      </select>
+      <input id="lp-login-pin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN (z. B. 1111)"
+             style="width:100%; padding:12px; border-radius:12px; border:2px solid #cbd5e1; font-size:18px; text-align:center; margin-top:10px; box-sizing:border-box;" />
+      <p id="lp-login-fehler" style="color:#dc2626; font-weight:700; margin-top:8px;"></p>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:center;">
+        <button class="btn-primary" onclick="pruefeMsamLehrpersonenPin()">Cockpit öffnen</button>
+        <button class="btn-ghost" onclick="zeigeStartseite()">Zurück</button>
+      </div>
+    </div>`;
+}
+
+window.loescheMsamSchueler = async (schuelerId, name) => {
+  if (!confirm(`Eintrag von "${name}" wirklich aus der Rangliste löschen?`)) return;
+  await fetch(`${MSAM_FIRESTORE_URL}/${schuelerId}`, { method: "DELETE" });
+  const aktuellesProfil = ladeMsamProfil();
+  if (aktuellesProfil && aktuellesProfil.id === schuelerId) {
+    localStorage.removeItem("msamSchuelerProfil");
+    localStorage.removeItem("klavierEntdeckerFortschritt");
+    localStorage.removeItem(`msam_quizkids_stand_${schuelerId}`);
+  }
+  pruefeMsamLehrpersonenPin();
+};
