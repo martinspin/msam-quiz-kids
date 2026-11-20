@@ -217,11 +217,11 @@ function starteFanfareUndKonfetti(erzwingen = false) {
 
 
 const appMusik = (() => {
-  let aktiv = true;
+  let aktiv = false;
   let imSpiel = false;
   let pfadIndex = 0;
   const pfade = Array.of(
-    "sounds/hintegrund.mp3",
+    "sounds/hintergrund.mp3",
     "sounds/hintergrund.mp3"
   );
 
