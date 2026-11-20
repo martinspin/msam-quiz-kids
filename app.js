@@ -2,19 +2,21 @@
 
 const KAPITEL_DATEN = Array.of(
   {
-    id: 0,
+       id: 0,
     stufe: 1,
     titel: "1. Gehör & Klang-Entdecker",
     icon: "👂",
     farbe: "#f59e0b",
-    beschreibung: "Hoch oder tief? Laut oder leise? Lang oder kurz? Trainiere deine Ohren!",
+    beschreibung: "Hoch oder tief? Schritt oder Sprung? Staccato, Legato, Dur & Moll!",
     spiele: Array.of(
       { id: "kap0_1", titel: "1.1 Hoch oder tief?", punkte: 100, startFn: "starteKap0Spiel(1)" },
-      { id: "kap0_2", titel: "1.2 Laut oder leise?", punkte: 100, startFn: "starteKap0Spiel(2)" },
-      { id: "kap0_3", titel: "1.3 Lang oder kurz?", punkte: 100, startFn: "starteKap0Spiel(3)" },
-      { id: "kap0_4", titel: "1.4 Aufwärts oder abwärts?", punkte: 120, startFn: "starteKap0Spiel(4)" },
-      { id: "kap0_5", titel: "1.5 Ohren-Detektiv", punkte: 150, startFn: "starteKap0Spiel(5)" }
+      { id: "kap0_2", titel: "1.2 Steigt oder fällt die Melodie?", punkte: 100, startFn: "starteKap0Spiel(2)" },
+      { id: "kap0_3", titel: "1.3 Schritt oder Sprung?", punkte: 100, startFn: "starteKap0Spiel(3)" },
+      { id: "kap0_4", titel: "1.4 Staccato oder Legato?", punkte: 120, startFn: "starteKap0Spiel(4)" },
+      { id: "kap0_5", titel: "1.5 Dur oder Moll?", punkte: 150, startFn: "starteKap0Spiel(5)" },
+      { id: "kap0_boss", titel: "1.6 Boss-Challenge: Gehör-Meister", punkte: 250, startFn: "starteKap0Spiel(6)" }
     )
+
   },
   {
     id: 1,
