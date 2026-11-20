@@ -68,7 +68,7 @@ function starteRundenDuell(stufeNr) {
   );
 
   const passendeFragen = fragenBasis.filter((f) => f.minStufe <= stufeNr);
-  const anzahlFragen = 8;
+  const anzahlFragen = 10;
   const fragen = passendeFragen.slice().sort(() => Math.random() - 0.5).slice(0, anzahlFragen);
 // =========================================================
 // STUFEN-DUELLE GEGEN DEN COMPUTER (ALLE 8 STUFEN) - TEIL 2
@@ -86,7 +86,7 @@ function starteRundenDuell(stufeNr) {
     }
   }
 
-  function zeichneRunde(feedbackText = "Lass dir Zeit – kein Zeitlimit! Wer hat nach 8 Fragen mehr Treffer?", feedbackFarbe = "#334155") {
+  function zeichneRunde(feedbackText = "Lass dir Zeit – kein Zeitlimit! Wer hat nach 10 Fragen mehr Treffer?", feedbackFarbe = "#334155") {
     const f = fragen.at(runde);
     const spielerProzent = Math.round((spielerPunkte / anzahlFragen) * 100);
     const botProzent = Math.round((botPunkte / anzahlFragen) * 100);
@@ -101,26 +101,25 @@ function starteRundenDuell(stufeNr) {
           <button class="btn-ghost" onclick="zeigeStartseite()">Abbrechen</button>
         </div>
 
-        <div style="background:${cfg.bg}; border:3px solid ${cfg.farbe}; border-radius:16px; padding:16px 18px; margin-bottom:16px; position:relative; overflow:hidden;">
-          <div style="position:absolute; right:16px; top:8px; bottom:8px; width:6px; background:repeating-linear-gradient(0deg, #000 0px, #000 8px, #fff 8px, #fff 16px); border-radius:3px;"></div>
-          <div style="position:absolute; right:26px; top:6px; font-size:12px; font-weight:900; color:${cfg.farbe};">ZIEL 🏁</div>
-
-          <div style="margin-bottom:14px;">
-            <div style="font-size:14px; font-weight:800; color:#1e3a8a; margin-bottom:4px;">${cfg.spielerIcon} Du: ${spielerPunkte} von ${anzahlFragen} richtig</div>
-            <div style="height:36px; background:rgba(255,255,255,0.65); border-radius:10px; position:relative; border:1px dashed ${cfg.farbe};">
-              <div style="position:absolute; left:calc(${Math.min(88, spielerProzent * 0.88)}%); top:1px; font-size:28px; transition:left 0.4s ease-out; transform:scaleX(-1);">${cfg.spielerIcon}</div>
-            </div>
+        <div style="background:${cfg.bg}; border:2px solid ${cfg.farbe}; border-radius:16px; padding:14px 16px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:800; margin-bottom:4px;">
+            <span>${cfg.spielerIcon} Du: ${spielerPunkte} / ${anzahlFragen}</span>
+            <span>🏁 Ziel</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.75); border-radius:999px; height:14px; overflow:hidden; margin-bottom:10px;">
+            <div style="width:${spielerProzent}%; background:${cfg.farbe}; height:100%; transition:width 0.35s ease;"></div>
           </div>
 
-          <div>
-            <div style="font-size:14px; font-weight:800; color:#991b1b; margin-bottom:4px;">${cfg.gegnerIcon} ${cfg.gegner}: ${botPunkte} von ${anzahlFragen} richtig</div>
-            <div style="height:36px; background:rgba(255,255,255,0.65); border-radius:10px; position:relative; border:1px dashed ${cfg.farbe};">
-              <div style="position:absolute; left:calc(${Math.min(88, botProzent * 0.88)}%); top:1px; font-size:28px; transition:left 0.4s ease-out; transform:scaleX(-1);">${cfg.gegnerIcon}</div>
-            </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:800; margin-bottom:4px;">
+            <span>${cfg.gegnerIcon} ${cfg.gegner}: ${botPunkte} / ${anzahlFragen}</span>
+            <span>🏁 Ziel</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.75); border-radius:999px; height:14px; overflow:hidden;">
+            <div style="width:${botProzent}%; background:#64748b; height:100%; transition:width 0.35s ease;"></div>
           </div>
         </div>
 
-        <div id="duell-feedback" style="text-align:center; font-weight:800; font-size:15px; color:${feedbackFarbe}; margin-bottom:14px; min-height:24px;">
+        <div style="text-align:center; font-size:14px; font-weight:800; color:${feedbackFarbe}; margin-bottom:14px;">
           ${feedbackText}
         </div>
 
@@ -133,7 +132,6 @@ function starteRundenDuell(stufeNr) {
         </div>
       </div>
     `;
-
     if (f.typ === "ton") {
       const btnHoeren = document.getElementById("btn-hoeren");
       if (btnHoeren) btnHoeren.onclick = () => spieleTonPaar(f.midi1, f.midi2);
