@@ -58,7 +58,7 @@ function baueViolinSystemSVG(notenListe, optionen = {}) {
     const hals = hatHals
       ? `<line x1="${cx + 11.5}" y1="${cy - 2}" x2="${cx + 11.5}" y2="${cy - 46}" stroke="${farbe}" stroke-width="3" stroke-linecap="round" />`
       : "";
-        const kopf = gefuellt
+    const kopf = gefuellt
       ? `<ellipse cx="${cx}" cy="${cy}" rx="12.5" ry="9" transform="rotate(-16 ${cx} ${cy})" fill="${farbe}" />`
       : `<ellipse cx="${cx}" cy="${cy}" rx="12.5" ry="9" transform="rotate(-16 ${cx} ${cy})" fill="none" stroke="${farbe}" stroke-width="3.2" />`;
     const labelOben = n.label
@@ -91,13 +91,14 @@ function starteKap6Spiel(nummer) {
   if (nummer === 5) starteKap6TonUndRhythmus();
   if (nummer === 6) starteKap6FinaleDiplom();
 }
-// 6.1 Die 3 Anker-Töne im Violinschlüssel (C – E – G)
+
+// 6.1 Die 3 Anker-Töne im Violinschlüssel (C – E – G) (10 Runden)
 function starteKap6AnkerToene() {
   const anker = VIOLIN_NOTEN.filter((n) => Array.of("C", "E", "G").includes(n.ton));
   const runden = mischeZufallKap6(Array.of(
     anker.at(0), anker.at(1), anker.at(2),
     anker.at(0), anker.at(1), anker.at(2),
-    anker.at(2), anker.at(0)
+    anker.at(2), anker.at(0), anker.at(1), anker.at(2)
   ));
   let idx = 0;
 
@@ -134,7 +135,7 @@ function starteKap6AnkerToene() {
   render();
 }
 
-// 6.2 Alle Noten von C bis A im Violinschlüssel benennen
+// 6.2 Alle Noten von C bis A im Violinschlüssel benennen (10 Runden)
 function starteKap6NotennamenLesen() {
   const runden = mischeZufallKap6(Array.of(0, 1, 2, 3, 4, 5, 2, 4, 1, 3));
   let idx = 0;
@@ -171,7 +172,7 @@ function starteKap6NotennamenLesen() {
   };
   render();
 }
-// 6.3 Note im Violinschlüssel lesen & direkt auf dem Klavier antippen
+// 6.3 Note im Violinschlüssel lesen & direkt auf dem Klavier antippen (10 Runden)
 function starteKap6NoteAufKlavier() {
   const runden = mischeZufallKap6(Array.of(0, 2, 4, 1, 3, 5, 2, 0, 4, 3));
   let idx = 0;
@@ -207,7 +208,8 @@ function starteKap6NoteAufKlavier() {
   };
   render();
 }
-// 6.4 Bekannte Kinderlieder nach Noten direkt auf der Klaviatur spielen!
+
+// 6.4 Bekannte Kinderlieder nach Noten direkt auf der Klaviatur spielen! (6 Kinderlieder)
 function starteKap6KinderliederNoten() {
   const lieder = Array.of(
     {
@@ -256,6 +258,29 @@ function starteKap6KinderliederNoten() {
         { stufe: 5, ton: "A", midi: 69, schlaege: 1 },
         { stufe: 4, ton: "G", midi: 67, schlaege: 2 }
       )
+    },
+    {
+      titel: "🐦 Kuckuck, ruft’s aus dem Wald (Anfang)",
+      startTipp: "Starte hoch auf G und springe zum E!",
+      noten: Array.of(
+        { stufe: 4, ton: "G", midi: 67, schlaege: 2 },
+        { stufe: 2, ton: "E", midi: 64, schlaege: 1 },
+        { stufe: 4, ton: "G", midi: 67, schlaege: 2 },
+        { stufe: 2, ton: "E", midi: 64, schlaege: 1 }
+      )
+    },
+    {
+      titel: "🎂 Backe, backe Kuchen (Anfang)",
+      startTipp: "Starte auf C und hüpfe hoch!",
+      noten: Array.of(
+        { stufe: 0, ton: "C", midi: 60, schlaege: 1 },
+        { stufe: 0, ton: "C", midi: 60, schlaege: 1 },
+        { stufe: 2, ton: "E", midi: 64, schlaege: 1 },
+        { stufe: 2, ton: "E", midi: 64, schlaege: 1 },
+        { stufe: 4, ton: "G", midi: 67, schlaege: 1 },
+        { stufe: 4, ton: "G", midi: 67, schlaege: 1 },
+        { stufe: 5, ton: "A", midi: 69, schlaege: 2 }
+      )
     }
   );
   let liedIdx = 0;
@@ -263,7 +288,7 @@ function starteKap6KinderliederNoten() {
 
   const render = (hinweis = "") => {
     if (liedIdx >= lieder.length) {
-      abschliessenSpiel("kap6_4", 230, "Konzert-Pianist!", "Du hast echte Kinderlieder nach Noten auf dem Klavier gespielt!");
+      abschliessenSpiel("kap6_4", 230, "Konzert-Pianist!", "Du hast 6 echte Kinderlieder nach Noten auf dem Klavier gespielt!");
       return;
     }
     const lied = lieder.at(liedIdx);
@@ -310,7 +335,7 @@ function starteKap6KinderliederNoten() {
   };
   render();
 }
-// 6.5 Ton & Rhythmus-Kombi: Tonname + Rhythmus-Wort (Da / Bon-bon) zusammen erkennen
+// 6.5 Ton & Rhythmus-Kombi: Tonname + Rhythmus-Wort (Da / Bon-bon) zusammen erkennen (10 Runden)
 function starteKap6TonUndRhythmus() {
   const aufgaben = mischeZufallKap6(Array.of(
     { stufe: 0, ton: "C", schlaege: 1, wort: "Da", midi: 60 },
@@ -320,7 +345,9 @@ function starteKap6TonUndRhythmus() {
     { stufe: 3, ton: "F", schlaege: 1, wort: "Da", midi: 65 },
     { stufe: 5, ton: "A", schlaege: 2, wort: "Bon-bon", midi: 69 },
     { stufe: 4, ton: "G", schlaege: 1, wort: "Da", midi: 67 },
-    { stufe: 0, ton: "C", schlaege: 2, wort: "Bon-bon", midi: 60 }
+    { stufe: 0, ton: "C", schlaege: 2, wort: "Bon-bon", midi: 60 },
+    { stufe: 2, ton: "E", schlaege: 2, wort: "Bon-bon", midi: 64 },
+    { stufe: 5, ton: "A", schlaege: 1, wort: "Da", midi: 69 }
   ));
   let idx = 0;
 
@@ -366,8 +393,7 @@ function starteKap6TonUndRhythmus() {
   };
   render();
 }
-
-// 6.6 Finale Abschluss-Prüfung: Piano-Kids Meister-Diplom!
+// 6.6 Finale Abschluss-Prüfung: Piano-Kids Meister-Diplom! (10 Runden)
 function starteKap6FinaleDiplom() {
   const fragen = mischeZufallKap6(Array.of(
     { modus: "note", stufe: 0, ton: "C", midi: 60 },
@@ -377,13 +403,15 @@ function starteKap6FinaleDiplom() {
     { modus: "klavier", stufe: 5, ton: "A", midi: 69 },
     { modus: "rhythmus", wort: "Kau-gum-mi", schlaege: 3 },
     { modus: "rhythmus", wort: "Gum-mi-bär-chen", schlaege: 4 },
-    { modus: "klavier", stufe: 1, ton: "D", midi: 62 }
+    { modus: "klavier", stufe: 1, ton: "D", midi: 62 },
+    { modus: "note", stufe: 5, ton: "A", midi: 69 },
+    { modus: "rhythmus", wort: "Bon-bon", schlaege: 2 }
   ));
   let idx = 0;
   let leben = 3;
 
-    const zeigeDiplomUrkunde = () => {
-    starteFanfareUndKonfetti(true);
+  const zeigeDiplomUrkunde = () => {
+    if (typeof starteFanfareUndKonfetti === "function") starteFanfareUndKonfetti(true);
     const daten = ladeFortschritt();
     if (!daten.erledigt.includes("kap6_6")) daten.erledigt.push("kap6_6");
     daten.sterne += 300;
@@ -411,7 +439,7 @@ function starteKap6FinaleDiplom() {
         </p>
         <div class="reward-badge" style="font-size:20px;">+300 Bonus-Sterne ⭐ (Gesamt: ${daten.sterne} ⭐)</div>
         <div style="margin-top:24px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-          <button class="btn-primary" style="background:#f59e0b; border-color:#d97706;" onclick="window.print()">🖨️ Diplom drucken</button>
+          <button class="btn-primary" style="background:#f59e0b; border-color:#d97706;" onclick="if (typeof druckeMsamDiplom === 'function') { druckeMsamDiplom(document.getElementById('diplom-name-anzeige').textContent, ${daten.sterne}); } else { window.print(); }">🖨️ Diplom drucken</button>
           <button class="btn-primary" onclick="zeigeStartseite()">Zurück zur Übersicht</button>
         </div>
       </div>`;
@@ -463,8 +491,8 @@ function starteKap6FinaleDiplom() {
         <div class="card" style="text-align:center;">
           <div class="quiz-meta"><span>🎓 Finale ${idx + 1} / ${fragen.length}</span><span>${herzen}</span></div>
           ${baueViolinSystemSVG(Array.of({ stufe: akt.stufe, farbe: "#0284c7" }))}
-          <p class="quiz-hint">${hinweis || "Tippe die passende Taste auf dem Klavier an!"}</p>
-          ${baueKap6Klaviatur("checkKap6FinaleKlavier")}
+          <p class="quiz-hint">${hinweis || "Lies die Note und tippe die passende Taste auf dem Klavier!"}</p>
+          <div style="margin-top:8px;">${baueKap6Klaviatur("checkKap6FinaleKlavier")}</div>
         </div>`;
     }
   };
@@ -496,6 +524,7 @@ function starteKap6FinaleDiplom() {
 
   render();
 }
+
 // Kompatible Klaviatur für Kapitel 6 (funktioniert mit jeder keyboard.js-Version)
 function baueKap6Klaviatur(callbackName) {
   const weisseToene = Array.of(

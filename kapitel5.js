@@ -100,9 +100,10 @@ function starteKap5Spiel(nummer) {
   if (nummer === 5) starteKap5TaktBaumeister();
   if (nummer === 6) starteKap5Boss();
 }
-// 5.1 Rhythmus-Wörter & Notenwerte zuordnen
+
+// 5.1 Rhythmus-Wörter & Notenwerte zuordnen (10 Runden)
 function starteKap5WoerterUndNoten() {
-  const runden = mischeZufallKap5(Array.of(1, 2, 3, 4, 1, 2, 3, 4));
+  const runden = mischeZufallKap5(Array.of(1, 2, 3, 4, 1, 2, 3, 4, 2, 3));
   let idx = 0;
 
   const render = (hinweis = "Welches Rhythmus-Wort gehört zu dieser Note?") => {
@@ -146,9 +147,9 @@ function starteKap5WoerterUndNoten() {
   render();
 }
 
-// 5.2 Tonlängen hören: Wie viele Schläge klingt der Flügelton?
+// 5.2 Tonlängen hören: Wie viele Schläge klingt der Flügelton? (10 Runden)
 function starteKap5TonlaengenHoeren() {
-  const runden = mischeZufallKap5(Array.of(1, 2, 3, 4, 2, 4, 1, 3));
+  const runden = mischeZufallKap5(Array.of(1, 2, 3, 4, 2, 4, 1, 3, 1, 4));
   let idx = 0;
 
   const render = (hinweis = "Höre gut zu und sprich das Rhythmus-Wort mit!") => {
@@ -192,9 +193,9 @@ function starteKap5TonlaengenHoeren() {
   };
   render();
 }
-// 5.3 Vom Wort zum Zählen (1 – 2 – 3 – 4)
+// 5.3 Vom Wort zum Zählen (1 – 2 – 3 – 4) (10 Runden)
 function starteKap5VomWortZumZaehlen() {
-  const runden = mischeZufallKap5(Array.of(1, 2, 3, 4, 3, 1, 4, 2));
+  const runden = mischeZufallKap5(Array.of(1, 2, 3, 4, 3, 1, 4, 2, 2, 4));
   let idx = 0;
 
   const render = (hinweis = "Wie zählen wir diese Note im Takt aus?") => {
@@ -238,9 +239,9 @@ function starteKap5VomWortZumZaehlen() {
   render();
 }
 
-// 5.4 Aushalte-Pad: Ton drücken und genau für 1, 2, 3 oder 4 Schläge halten!
+// 5.4 Aushalte-Pad: Ton drücken und genau für 1, 2, 3 oder 4 Schläge halten! (10 Runden)
 function starteKap5AushaltePad() {
-  const runden = mischeZufallKap5(Array.of(2, 3, 4, 1, 3, 4));
+  const runden = mischeZufallKap5(Array.of(2, 3, 4, 1, 3, 4, 2, 1, 3, 4));
   let idx = 0;
   let timer = null;
   let schlagZaehler = 0;
@@ -278,6 +279,7 @@ function starteKap5AushaltePad() {
         </button>
       </div>`;
   };
+
   window.startePadHalten = () => {
     if (gedrueckt) return;
     gedrueckt = true;
@@ -326,8 +328,7 @@ function starteKap5AushaltePad() {
 
   render();
 }
-
-// 5.5 Takt-Baumeister: 3/4- und 4/4-Takte mit der richtigen Note auffüllen
+// 5.5 Takt-Baumeister: 3/4- und 4/4-Takte mit der richtigen Note auffüllen (10 Runden)
 function starteKap5TaktBaumeister() {
   const aufgaben = mischeZufallKap5(Array.of(
     { takt: 4, schonDa: Array.of(2), fehlt: 2 },
@@ -337,7 +338,9 @@ function starteKap5TaktBaumeister() {
     { takt: 3, schonDa: Array.of(2), fehlt: 1 },
     { takt: 3, schonDa: Array.of(1), fehlt: 2 },
     { takt: 3, schonDa: Array.of(1, 1), fehlt: 1 },
-    { takt: 4, schonDa: Array.of(1), fehlt: 3 }
+    { takt: 4, schonDa: Array.of(1), fehlt: 3 },
+    { takt: 4, schonDa: Array.of(1, 2), fehlt: 1 },
+    { takt: 4, schonDa: Array.of(1, 1, 1), fehlt: 1 }
   ));
   let idx = 0;
 
@@ -392,7 +395,8 @@ function starteKap5TaktBaumeister() {
   };
   render();
 }
-// 5.6 Boss-Challenge: Rhythmus & Notenwerte (3 Herzen, Flügel-Fanfare & Konfetti!)
+
+// 5.6 Boss-Challenge: Rhythmus & Notenwerte (10 Runden, 3 Herzen, Flügel-Fanfare & Konfetti!)
 function starteKap5Boss() {
   const fragen = mischeZufallKap5(Array.of(
     { modus: "wort", schlaege: 3 },
@@ -402,7 +406,9 @@ function starteKap5Boss() {
     { modus: "takt", takt: 4, schonDa: Array.of(2, 1), fehlt: 1 },
     { modus: "takt", takt: 3, schonDa: Array.of(1), fehlt: 2 },
     { modus: "wort", schlaege: 1 },
-    { modus: "takt", takt: 4, schonDa: Array.of(1), fehlt: 3 }
+    { modus: "takt", takt: 4, schonDa: Array.of(1), fehlt: 3 },
+    { modus: "zaehl", schlaege: 4 },
+    { modus: "takt", takt: 4, schonDa: Array.of(2), fehlt: 2 }
   ));
   let idx = 0;
   let leben = 3;
@@ -419,8 +425,8 @@ function starteKap5Boss() {
       return;
     }
     if (idx >= fragen.length) {
-      starteFanfareUndKonfetti();
-      abschliessenSpiel("kap5_6", 250, "🎉 RHYTHMUS-MEISTER! 🎉", "Du hast alle 5 Kapitel von Piano-Kids gemeistert!");
+      if (typeof starteFanfareUndKonfetti === "function") starteFanfareUndKonfetti();
+      abschliessenSpiel("kap5_6", 250, "🎉 RHYTHMUS-MEISTER! 🎉", "Du hast alle Rhythmus- & Takt-Aufgaben gemeistert!");
       return;
     }
 
@@ -475,15 +481,14 @@ function starteKap5Boss() {
 
   window.checkKap5Boss = (richtig) => {
     if (richtig) {
-      klavierAudio.spieleMidi(67, 0.5);
+      klavierAudio.spieleMidi(72);
       idx++;
       render("Volltreffer! ✅");
     } else {
       leben--;
       klavierAudio.spieleQuietsch();
-      render("Daneben! (-1 Herz)");
+      render("Daneben – 1 Herz verloren! Zähle die Schläge genau!");
     }
   };
-
   render();
 }
