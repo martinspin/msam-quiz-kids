@@ -202,10 +202,17 @@ function zeigeStartseite() {
     ? `Hallo ${profil.vorname}! 🎹`
     : `Willkommen bei <span style="text-transform:lowercase;">msam quiz kids</span>! 🎹`;
 
-  const stufenMeta = Array.of(
+   const stufenMeta = Array.of(
     { nr: 1, titel: "Stufe 1 · Einsteiger-Kids", untertitel: "Gehör, Stammtöne, Klaviatur, Violinschlüssel (c'–g') & Rhythmus", farbe: "#e11d48", duellTitel: "🐎 Musik-Pferderennen gegen Blitz-Huf" },
-    { nr: 2, titel: "Stufe 2 · Entdecker-Kids", untertitel: "Violinschlüssel bis g'', Bassschlüssel (c–c'), Achtel & Vorzeichen", farbe: "#7c3aed", duellTitel: "🐸 Frosch-Hüpfen gegen Quak-Bot" }
+    { nr: 2, titel: "Stufe 2 · Entdecker-Kids", untertitel: "Violinschlüssel bis g'', Bassschlüssel (c–c'), Achtel & Vorzeichen", farbe: "#7c3aed", duellTitel: "🐸 Frosch-Hüpfen gegen Quak-Bot" },
+    { nr: 3, titel: "Stufe 3 · Rhythmus-Profis", untertitel: "Auflösungszeichen, punktierte Noten, Taktarten & Pausenwerte", farbe: "#0d9488", duellTitel: "🐢 Schildkröten-Sprint gegen Turbo-Panzer" },
+    { nr: 4, titel: "Stufe 4 · Tonleiter-Surfer", untertitel: "Halbton- & Ganztonschritte, Oktave & erste Dur-Tonleitern", farbe: "#2563eb", duellTitel: "🐬 Delfin-Wellenreiten gegen Sonar-Bot" },
+    { nr: 5, titel: "Stufe 5 · Intervall-Flieger", untertitel: "Prime bis Oktave hören & bestimmen, Dynamik & Tempozeichen", farbe: "#6d28d9", duellTitel: "🦅 Adler-Gipfelflug gegen Sturm-Schwinge" },
+    { nr: 6, titel: "Stufe 6 · Vorzeichen-Füchse", untertitel: "Quintenzirkel mit Kreuzen (♯) & Bes (♭), Moll-Parallelen", farbe: "#ea580c", duellTitel: "🦊 Fuchs-Fährtenjagd gegen Schlau-Bot" },
+    { nr: 7, titel: "Stufe 7 · Akkord-Bändiger", untertitel: "Dur- & Moll-Dreiklänge, Umkehrungen & Begleitmuster", farbe: "#dc2626", duellTitel: "🐉 Drachen-Wolkenritt gegen Funken-Flug" },
+    { nr: 8, titel: "Stufe 8 · Musik-Meister:innen", untertitel: "Kadenzen, Formenlehre, Gehör-Mix & grosses Abschluss-Finale", farbe: "#d97706", duellTitel: "🦁 Meister-Löwen-Finale gegen Maestro-Bot" }
   );
+
 
   let ersteAktiveGefunden = false;
 
@@ -433,7 +440,7 @@ function abschliessenSpiel(spielId, punkte, titel, text) {
         +${neu ? punkte : Math.round(punkte / 4)} ⭐ gesammelt!
       </div>
       <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-        ${kapitelKomplett ? `<button class="btn-primary" style="background:#7c3aed;" onclick="starteStufenDuell(${kapId})">⚔️ Stufen-Duell gegen Computer!</button>` : ""}
+        ${kapitelKomplett && kapId % 6 === 0 ? `<button class="btn-primary" style="background:#7c3aed;" onclick="starteStufenDuell(${Math.ceil(kapId / 6)})">⚔️ Stufen-Duell gegen Computer!</button>` : ""}
         <button class="btn-primary" onclick="zeigeKapitel(${kapId})">Weiter im Kapitel</button>
         <button class="btn-ghost" onclick="zeigeStartseite()">Zur Startseite</button>
       </div>
