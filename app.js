@@ -312,10 +312,7 @@ function baueMsamDiplomBox(daten, profil) {
 
 function zeigeKapitel(kapitelId) {
   const kap = KAPITEL_DATEN.find((k) => k.id === kapitelId);
-  if (!kap) {
-    zeigeStartseite();
-    return;
-  }
+  if (!kap) { zeigeStartseite(); return; }
   const daten = ladeFortschritt();
   const alleGeschafft = kap.spiele.every((sp) => daten.erledigt.includes(sp.id));
 
@@ -334,18 +331,14 @@ function zeigeKapitel(kapitelId) {
   }).join("");
 
   const duellKarteHTML = alleGeschafft
-    ? `
-      <div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; border:2px solid #7c3aed; background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+    ? `<div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; border:2px solid #7c3aed; background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
         <div>
           <div style="font-size:18px; font-weight:900; color:#5b21b6;">⚔️ Stufen-Finale gegen den Computer</div>
           <div style="font-size:13px; color:#6d28d9;">Alle Übungen geschafft! Tritt jetzt im Action-Duell an (+15 Bonus-⭐).</div>
         </div>
-        <button class="btn-primary" style="background:#7c3aed; flex-shrink:0;" onclick="starteStufenDuell(${kap.id})">
-          Duell starten! 🚀
-        </button>
+        <button class="btn-primary" style="background:#7c3aed; flex-shrink:0;" onclick="starteStufenDuell(${kap.id})">Duell starten! 🚀</button>
       </div>`
-    : `
-      <div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; border:2px dashed #cbd5e1; background:#f8fafc; opacity:0.85;">
+    : `<div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; border:2px dashed #cbd5e1; background:#f8fafc; opacity:0.85;">
         <div>
           <div style="font-size:17px; font-weight:800; color:#475569;">🔒 Stufen-Finale gegen den Computer</div>
           <div style="font-size:13px; color:#64748b;">Schliesse zuerst alle Übungen dieser Stufe ab, um das Computer-Duell freizuschalten!</div>
