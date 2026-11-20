@@ -29,26 +29,18 @@ function spieleAkkordKap0(notenListe, dauer = 1.0) {
   });
 }
 
-// Echter Steinway-Flügel im Staccato (0.11 Sekunden)
+// Echter Steinway-Flügel im Staccato
 function spieleStaccatoTonKap0(midi) {
   if (typeof klavierAudio !== "undefined") {
     klavierAudio.spieleMidi(midi, 0.18, 1.0);
   }
 }
 
-function spieleStaccatoFolgeKap0(notenListe, abstandMs = 400) {
-  notenListe.forEach((midi, i) => {
-    setTimeout(() => spieleStaccatoTonKap0(midi), 120 + i * abstandMs);
-  });
-}
-
-
 function spieleStaccatoFolgeKap0(notenListe, abstandMs = 380) {
   notenListe.forEach((midi, i) => {
     setTimeout(() => spieleStaccatoTonKap0(midi), 120 + i * abstandMs);
   });
 }
-
 
 function starteKap0Spiel(nummer) {
   if (typeof appMusik !== "undefined") appMusik.stop();
@@ -59,65 +51,7 @@ function starteKap0Spiel(nummer) {
   if (nummer === 5) starteKap0Boss();
 }
 
-
-// 1.1 Hoch oder tief? (Vogel vs. Bär)
-function starteKap0HochTief() {
-  const aufgaben = mischeZufallKap0(Array.of(
-    { m1: 60, m2: 72, typ: "hoch" },
-    { m1: 72, m2: 60, typ: "tief" },
-    { m1: 64, m2: 64, typ: "gleich" },
-    { m1: 62, m2: 74, typ: "hoch" },
-    { m1: 76, m2: 64, typ: "tief" },
-    { m1: 67, m2: 67, typ: "gleich" },
-    { m1: 60, m2: 69, typ: "hoch" },
-    { m1: 71, m2: 62, typ: "tief" },
-    { m1: 65, m2: 65, typ: "gleich" },
-    { m1: 64, m2: 76, typ: "hoch" }
-  ));
-  let idx = 0;
-
-  const spieleAktuell = () => {
-    const akt = aufgaben.at(idx);
-    spieleTonfolgeKap0(Array.of(akt.m1, akt.m2), 0.55, 420);
-  };
-
-  const render = (hinweis = "Höre gut zu: Ist der 2. Ton höher, tiefer oder gleich?") => {
-    if (idx >= aufgaben.length) {
-      abschliessenSpiel("kap0_1", 120, "Ohren-Spitzer!", "Du erkennst hohe und tiefe Töne sofort!");
-      return;
-    }
-    document.getElementById("main-content").innerHTML = `
-      <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>1.1 Hoch oder tief?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
-        <div style="margin:18px 0;">
-          <button id="kap0-play-btn" class="btn-primary" style="font-size:20px; padding:14px 28px;">🔊 Töne anhören</button>
-        </div>
-        <p class="quiz-hint">${hinweis}</p>
-        <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:16px;">
-          <button class="answer-btn" style="background:#e0f2fe; border-color:#0284c7; color:#0c4a6e;" onclick="checkKap0HT('tief')">🐻 Tiefer</button>
-          <button class="answer-btn" style="background:#f1f5f9; border-color:#64748b; color:#0f172a;" onclick="checkKap0HT('gleich')">➡️ Gleich</button>
-          <button class="answer-btn" style="background:#fef3c7; border-color:#f59e0b; color:#78350f;" onclick="checkKap0HT('hoch')">🐦 Höher</button>
-        </div>
-      </div>`;
-    document.getElementById("kap0-play-btn").onclick = spieleAktuell;
-    spieleAktuell();
-  };
-
-  window.checkKap0HT = (wahl) => {
-    const akt = aufgaben.at(idx);
-    if (wahl === akt.typ) {
-      idx++;
-      render("Super gehört! ✅");
-    } else {
-      klavierAudio.spieleQuietsch();
-      setTimeout(spieleAktuell, 300);
-      render("Hör nochmals genau hin: Klettert der 2. Ton nach oben oder fällt er nach unten?");
-    }
-  };
-  render();
-}
-
-// 1.2 Steigt oder fällt die Melodie?
+// 1.1 Steigt oder fällt die Melodie?
 function starteKap0MelodieRichtung() {
   const aufgaben = mischeZufallKap0(Array.of(
     { toene: Array.of(60, 64, 67), typ: "hoch" },
@@ -144,7 +78,7 @@ function starteKap0MelodieRichtung() {
     }
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>1.2 Steigt oder fällt die Melodie?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
+        <div class="quiz-meta"><span>1.1 Steigt oder fällt die Melodie?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
         <div style="margin:18px 0;">
           <button id="kap0-play-btn" class="btn-primary" style="font-size:20px; padding:14px 28px;">🔊 Melodie anhören</button>
         </div>
@@ -172,7 +106,8 @@ function starteKap0MelodieRichtung() {
   };
   render();
 }
-// 1.3 Schritt oder grosser Sprung?
+
+// 1.2 Schritt oder grosser Sprung?
 function starteKap0SchrittSprung() {
   const aufgaben = mischeZufallKap0(Array.of(
     { m1: 60, m2: 62, typ: "schritt" },
@@ -193,14 +128,14 @@ function starteKap0SchrittSprung() {
     spieleTonfolgeKap0(Array.of(akt.m1, akt.m2), 0.55, 420);
   };
 
-  const render = (hinweis = "Liegen die zwei Töne ganz nah beieinander oder machen sie einen grossen Sprung?") => {
+  const render = (hinweis = "Liegen die zwei Töne ganz nah beinander oder machen sie einen grossen Sprung?") => {
     if (idx >= aufgaben.length) {
       abschliessenSpiel("kap0_3", 150, "Abstands-Ass!", "Kleine Schritte und weite Sprünge erkennst du blind!");
       return;
     }
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>1.3 Schritt oder grosser Sprung?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
+        <div class="quiz-meta"><span>1.2 Schritt oder grosser Sprung?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
         <div style="margin:18px 0;">
           <button id="kap0-play-btn" class="btn-primary" style="font-size:20px; padding:14px 28px;">🔊 Töne anhören</button>
         </div>
@@ -227,8 +162,7 @@ function starteKap0SchrittSprung() {
   };
   render();
 }
-
-// 1.4 Staccato (hüpfend) oder Legato (gleitend)?
+// 1.3 Staccato (hüpfend) oder Legato (gleitend)?
 function starteKap0StaccatoLegato() {
   const aufgaben = mischeZufallKap0(Array.of(
     { toene: Array.of(60, 62, 64, 65), typ: "staccato" },
@@ -258,7 +192,7 @@ function starteKap0StaccatoLegato() {
     }
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>1.4 Staccato oder Legato?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
+        <div class="quiz-meta"><span>1.3 Staccato oder Legato?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
         <div style="margin:18px 0;">
           <button id="kap0-play-btn" class="btn-primary" style="font-size:20px; padding:14px 28px;">🔊 Melodie anhören</button>
         </div>
@@ -285,7 +219,8 @@ function starteKap0StaccatoLegato() {
   };
   render();
 }
-// 1.5 Dur (fröhlich) oder Moll (nachdenklich)?
+
+// 1.4 Dur (fröhlich) oder Moll (nachdenklich)?
 function starteKap0DurMoll() {
   const aufgaben = mischeZufallKap0(Array.of(
     { toene: Array.of(60, 64, 67), typ: "dur" },
@@ -310,7 +245,7 @@ function starteKap0DurMoll() {
     }
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>1.5 Dur oder Moll?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
+        <div class="quiz-meta"><span>1.4 Dur oder Moll?</span><span>${idx + 1} / ${aufgaben.length}</span></div>
         <div style="margin:18px 0;">
           <button id="kap0-play-btn" class="btn-primary" style="font-size:20px; padding:14px 28px;">🔊 Klang anhören</button>
         </div>
@@ -338,7 +273,7 @@ function starteKap0DurMoll() {
   render();
 }
 
-// 1.6 Boss-Challenge: Gehör-Meister (10 gemischte Höraufgaben)
+// 1.5 Boss-Challenge: Gehör-Meister (10 gemischte Höraufgaben)
 function starteKap0Boss() {
   const fragen = mischeZufallKap0(Array.of(
     { modus: "ht", m1: 60, m2: 72, antwort: "hoch", frage: "Ist der 2. Ton höher oder tiefer?", opt1: Array.of("tief", "🐻 Tiefer"), opt2: Array.of("hoch", "🐦 Höher") },
