@@ -217,7 +217,7 @@ function zeigeStartseite() {
       0
     );
 
-    const istFertig = (gesamtSpiele > 0 && erledigtSpiele >= gesamtSpiele) || (st.nr === 1 && (erledigtSpiele >= 20 || daten.sterne >= 2000));
+    const istFertig = gesamtSpiele > 0 && erledigtSpiele >= gesamtSpiele;
     let istOffen = false;
     if (!istFertig && !ersteAktiveGefunden) {
       istOffen = true;
