@@ -293,7 +293,125 @@ function zeigeStartseite() {
     ${baueMsamDiplomBox(daten, profil)}`;
 }
 
-// 3/3 APP.JS: msam Musik-Diplom, Kapitel-Ansicht, Abschluss & Initialisierung
+function druckeMsamDiplom(name, sterne) {
+  const datum = new Date().toLocaleDateString("de-CH", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+  const fenster = window.open("", "_blank", "width=900,height=680");
+  if (!fenster) {
+    window.print();
+    return;
+  }
+  fenster.document.write(`<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Musik-Diplom – ${name}</title>
+  <style>
+    @page { size: A4 landscape; margin: 14mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fffbeb;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .urkunde {
+      width: 100%;
+      max-width: 980px;
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 50%, #fef3c7 100%);
+      border: 8px double #d97706;
+      border-radius: 24px;
+      padding: 44px 48px;
+      text-align: center;
+      box-shadow: 0 12px 35px rgba(180, 83, 9, 0.15);
+    }
+    .schule {
+      font-size: 16px;
+      font-weight: 800;
+      color: #e11d48;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+    .emoji { font-size: 58px; margin: 8px 0; }
+    h1 {
+      font-size: 40px;
+      font-weight: 900;
+      color: #92400e;
+      margin: 6px 0 18px;
+    }
+    .sub { font-size: 18px; color: #475569; }
+    .name {
+      font-size: 38px;
+      font-weight: 900;
+      color: #0f172a;
+      margin: 14px auto;
+      padding: 8px 28px;
+      border-bottom: 3px solid #f59e0b;
+      display: inline-block;
+    }
+    .text {
+      font-size: 19px;
+      line-height: 1.6;
+      color: #334155;
+      max-width: 680px;
+      margin: 14px auto 28px;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid #fde68a;
+      font-size: 15px;
+      color: #64748b;
+    }
+    .sig { text-align: center; min-width: 220px; }
+    .sig-line { border-top: 1.5px solid #94a3b8; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="urkunde">
+    <div class="schule">🎶 musikschule appenzeller mittelland · msam quiz kids</div>
+    <div class="emoji">🎓🏆🎹</div>
+    <h1>Offizielles Musik-Diplom</h1>
+    <div class="sub">Hiermit wird feierlich bestätigt, dass</div>
+    <div class="name">${name}</div>
+    <div class="text">
+      die <strong>Stufe 1 (Einsteiger-Kids)</strong> in Musiklehre, Gehörbildung,
+      Klaviatur, Notenlesen und Rhythmus erfolgreich gemeistert und dabei stolze
+      <strong>${sterne} ⭐</strong> gesammelt hat!
+    </div>
+    <div class="footer">
+      <div class="sig">
+        <div style="font-weight:700; color:#0f172a; margin-bottom:4px;">${datum}</div>
+        <div class="sig-line"></div>
+        <div>Datum</div>
+      </div>
+      <div style="font-size:36px;">🌟</div>
+      <div class="sig">
+        <div style="font-weight:700; color:#e11d48; margin-bottom:4px;">msam quiz kids</div>
+        <div class="sig-line"></div>
+        <div>musikschule appenzeller mittelland</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() { window.print(); }, 250);
+    };
+  </script>
+</body>
+</html>`);
+  fenster.document.close();
+}
 
 function baueMsamDiplomBox(daten, profil) {
   const stufe1Kapitel = KAPITEL_DATEN.filter((k) => (k.stufe || 1) === 1);
@@ -304,6 +422,7 @@ function baueMsamDiplomBox(daten, profil) {
   );
   const stufe1Geschafft = stufe1Erledigt >= stufe1Gesamt || stufe1Erledigt >= 20 || daten.sterne >= 2000;
   const name = profil ? `${profil.vorname} ${profil.nachname || ""}`.trim() : "Klavier-Entdecker/in";
+  const sichererName = name.replace(/'/g, "\\'");
 
   if (!stufe1Geschafft) {
     return `
@@ -328,7 +447,7 @@ function baueMsamDiplomBox(daten, profil) {
         <strong>${daten.sterne} ⭐</strong> gesammelt hat!
       </p>
       <div style="margin-top:16px;">
-        <button class="btn-primary" style="background:#d97706;" onclick="window.print()">🖨️ Diplom drucken / speichern</button>
+        <button class="btn-primary" style="background:#d97706;" onclick="druckeMsamDiplom('${sichererName}', ${daten.sterne})">🖨️ Diplom drucken / als PDF speichern</button>
       </div>
     </div>`;
 }
