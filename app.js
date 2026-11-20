@@ -202,8 +202,8 @@ function zeigeStartseite() {
     : `Willkommen bei <span style="text-transform:lowercase;">msam quiz kids</span>! 🎹`;
 
   const stufenMeta = Array.of(
-    { nr: 1, titel: "Stufe 1 · Einsteiger-Kids", untertitel: "Gehör, Stammtöne, Klaviatur, Violinschlüssel (c'–g') & Rhythmus", farbe: "#e11d48" },
-    { nr: 2, titel: "Stufe 2 · Entdecker-Kids", untertitel: "Violinschlüssel bis g'', Bassschlüssel (c–c'), Achtel & Vorzeichen", farbe: "#7c3aed" }
+    { nr: 1, titel: "Stufe 1 · Einsteiger-Kids", untertitel: "Gehör, Stammtöne, Klaviatur, Violinschlüssel (c'–g') & Rhythmus", farbe: "#e11d48", duellTitel: "🐎 Musik-Pferderennen gegen Blitz-Huf" },
+    { nr: 2, titel: "Stufe 2 · Entdecker-Kids", untertitel: "Violinschlüssel bis g'', Bassschlüssel (c–c'), Achtel & Vorzeichen", farbe: "#7c3aed", duellTitel: "🐸 Frosch-Hüpfen gegen Quak-Bot" }
   );
 
   let ersteAktiveGefunden = false;
@@ -239,6 +239,18 @@ function zeigeStartseite() {
         </div>`;
     }).join("");
 
+    const duellLeisteHTML = istFertig
+      ? `<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 20px; background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border-top:2px solid #c4b5fd; flex-wrap:wrap;">
+          <div>
+            <div style="font-size:15px; font-weight:900; color:#5b21b6;">⚔️ Stufen-Duell freigeschaltet: ${st.duellTitel}</div>
+            <div style="font-size:12px; color:#6d28d9;">Tritt jetzt gegen den Computer an (+15 Bonus-⭐)!</div>
+          </div>
+          <button type="button" class="btn-primary" style="background:#7c3aed; flex-shrink:0;" onclick="starteStufenDuell(${st.nr})">Duell starten! 🚀</button>
+        </div>`
+      : `<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 20px; background:#f8fafc; border-top:1px dashed #cbd5e1; color:#64748b; flex-wrap:wrap;">
+          <div style="font-size:14px; font-weight:700;">🔒 Stufen-Duell: ${st.duellTitel} <span style="font-weight:400; font-size:12px;">(wird freigeschaltet, sobald alle Spiele dieser Stufe geschafft sind)</span></div>
+        </div>`;
+
     return `
       <div style="margin-bottom: 18px; border-radius: 18px; overflow: hidden; border: 2px solid #e2e8f0; background: #ffffff; box-shadow: 0 4px 14px rgba(0,0,0,0.04);">
         <button type="button" onclick="toggleMsamStufe(${st.nr})"
@@ -255,6 +267,7 @@ function zeigeStartseite() {
         <div id="stufe-inhalt-${st.nr}" style="display:${istOffen ? "block" : "none"}; padding:16px;">
           <div class="chapters-grid">${kartenHTML}</div>
         </div>
+        ${duellLeisteHTML}
       </div>`;
   }).join("");
 
@@ -270,6 +283,7 @@ function zeigeStartseite() {
     ${stufenHTML}
     ${baueMsamDiplomBox(daten, profil)}`;
 }
+
 // 3/3 APP.JS: msam Musik-Diplom, Kapitel-Ansicht, Abschluss & Initialisierung
 
 function baueMsamDiplomBox(daten, profil) {
@@ -314,7 +328,6 @@ function zeigeKapitel(kapitelId) {
   const kap = KAPITEL_DATEN.find((k) => k.id === kapitelId);
   if (!kap) { zeigeStartseite(); return; }
   const daten = ladeFortschritt();
-  const alleGeschafft = kap.spiele.every((sp) => daten.erledigt.includes(sp.id));
 
   const spieleHTML = kap.spiele.map((sp) => {
     const geschafft = daten.erledigt.includes(sp.id);
@@ -330,21 +343,6 @@ function zeigeKapitel(kapitelId) {
       </div>`;
   }).join("");
 
-  const duellKarteHTML = alleGeschafft
-    ? `<div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; border:2px solid #7c3aed; background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
-        <div>
-          <div style="font-size:18px; font-weight:900; color:#5b21b6;">⚔️ Stufen-Finale gegen den Computer</div>
-          <div style="font-size:13px; color:#6d28d9;">Alle Übungen geschafft! Tritt jetzt im Action-Duell an (+15 Bonus-⭐).</div>
-        </div>
-        <button class="btn-primary" style="background:#7c3aed; flex-shrink:0;" onclick="starteStufenDuell(${kap.id})">Duell starten! 🚀</button>
-      </div>`
-    : `<div class="card" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; border:2px dashed #cbd5e1; background:#f8fafc; opacity:0.85;">
-        <div>
-          <div style="font-size:17px; font-weight:800; color:#475569;">🔒 Stufen-Finale gegen den Computer</div>
-          <div style="font-size:13px; color:#64748b;">Schliesse zuerst alle Übungen dieser Stufe ab, um das Computer-Duell freizuschalten!</div>
-        </div>
-      </div>`;
-
   document.getElementById("main-content").innerHTML = `
     <div style="margin-bottom:14px;">
       <button class="btn-ghost" onclick="zeigeStartseite()">← Zurück zur Übersicht</button>
@@ -354,8 +352,7 @@ function zeigeKapitel(kapitelId) {
       <h1>${kap.titel}</h1>
       <p>${kap.beschreibung}</p>
     </div>
-    ${spieleHTML}
-    ${duellKarteHTML}`;
+    ${spieleHTML}`;
 }
 
 
