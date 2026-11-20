@@ -61,36 +61,37 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap4_5", titel: "4.5 Notenlese-Profi", punkte: 180, startFn: "starteKap4Spiel(5)" }
     )
   },
-  {
-    id: 6,
+    {
+    id: 5,
     stufe: 1,
     titel: "5. Rhythmus & Notenwerte",
     icon: "🥁",
     farbe: "#ea580c",
     beschreibung: "Viertel, Halbe und Ganze Noten: Klatsche und zähle den Takt wie ein Profi!",
     spiele: Array.of(
-      { id: "kap6_1", titel: "5.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap6Spiel(1)" },
-      { id: "kap6_2", titel: "5.2 Schläge zählen", punkte: 130, startFn: "starteKap6Spiel(2)" },
-      { id: "kap6_3", titel: "5.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap6Spiel(3)" },
-      { id: "kap6_4", titel: "5.4 Takt-Baumeister", punkte: 160, startFn: "starteKap6Spiel(4)" },
-      { id: "kap6_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap6Spiel(5)" }
+      { id: "kap5_1", titel: "5.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap5Spiel(1)" },
+      { id: "kap5_2", titel: "5.2 Schläge zählen", punkte: 130, startFn: "starteKap5Spiel(2)" },
+      { id: "kap5_3", titel: "5.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap5Spiel(3)" },
+      { id: "kap5_4", titel: "5.4 Takt-Baumeister", punkte: 160, startFn: "starteKap5Spiel(4)" },
+      { id: "kap5_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap5Spiel(5)" }
     )
   },
   {
-    id: 5,
+    id: 6,
     stufe: 1,
     titel: "6. Erste Lieder lesen",
     icon: "🎵",
     farbe: "#9333ea",
     beschreibung: "Spiele echte Kinderlieder direkt vom Notenblatt auf dem Klavier!",
     spiele: Array.of(
-      { id: "kap5_1", titel: "6.1 Alle meine Entchen", punkte: 140, startFn: "starteKap5Spiel(1)" },
-      { id: "kap5_2", titel: "6.2 Hänschen klein", punkte: 140, startFn: "starteKap5Spiel(2)" },
-      { id: "kap5_3", titel: "6.3 Summ, summ, summ", punkte: 150, startFn: "starteKap5Spiel(3)" },
-      { id: "kap5_4", titel: "6.4 Lieder-Quiz", punkte: 160, startFn: "starteKap5Spiel(4)" },
-      { id: "kap5_5", titel: "6.5 Konzert-Pianist", punkte: 200, startFn: "starteKap5Spiel(5)" }
+      { id: "kap6_1", titel: "6.1 Alle meine Entchen", punkte: 140, startFn: "starteKap6Spiel(1)" },
+      { id: "kap6_2", titel: "6.2 Hänschen klein", punkte: 140, startFn: "starteKap6Spiel(2)" },
+      { id: "kap6_3", titel: "6.3 Summ, summ, summ", punkte: 150, startFn: "starteKap6Spiel(3)" },
+      { id: "kap6_4", titel: "6.4 Lieder-Quiz", punkte: 160, startFn: "starteKap6Spiel(4)" },
+      { id: "kap6_5", titel: "6.5 Konzert-Pianist", punkte: 200, startFn: "starteKap6Spiel(5)" }
     )
   },
+
   {
     id: 7,
     stufe: 2,
@@ -413,11 +414,17 @@ function abschliessenSpiel(spielId, punkte, titel, text) {
   speichereFortschritt(daten);
 
   let kapId = 0;
+  let kapStufe = 1;
   let kapitelKomplett = false;
+  let istLetztesKapitelDerStufe = false;
+
   KAPITEL_DATEN.forEach((k) => {
     if (k.spiele.some((s) => s.id === spielId)) {
       kapId = k.id;
+      kapStufe = k.stufe;
       kapitelKomplett = k.spiele.every((s) => daten.erledigt.includes(s.id));
+      const stufenKapitel = KAPITEL_DATEN.filter((x) => x.stufe === k.stufe);
+      istLetztesKapitelDerStufe = stufenKapitel.length >= 6 && stufenKapitel[stufenKapitel.length - 1].id === k.id;
     }
   });
 
@@ -435,19 +442,14 @@ function abschliessenSpiel(spielId, punkte, titel, text) {
       <div style="font-size:56px; margin-bottom:8px;">${kapitelKomplett ? "🎉🏆🎉" : "🏆"}</div>
       <h2>${titel}</h2>
       <p class="quiz-hint" style="margin:10px 0 18px;">${text}</p>
-      ${kapitelKomplett ? `<div style="font-size:18px; font-weight:800; color:#16a34a; margin-bottom:10px;">🌟 Kapitel ${kapId} komplett geschafft! 🌟</div>` : ""}
+      ${kapitelKomplett ? `<div style="font-size:18px; font-weight:800; color:#16a34a; margin-bottom:10px;">🌟 Kapitel komplett geschafft! 🌟</div>` : ""}
       <div style="font-size:20px; font-weight:900; color:#d97706; margin-bottom:22px;">
         +${neu ? punkte : Math.round(punkte / 4)} ⭐ gesammelt!
       </div>
       <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-        ${kapitelKomplett && (kapId + 1) % 6 === 0 ? `<button class="btn-primary" style="background:#7c3aed;" onclick="starteStufenDuell(${Math.floor(kapId / 6) + 1})">⚔️ Stufen-Duell gegen Computer!</button>` : ""}
+        ${kapitelKomplett && istLetztesKapitelDerStufe ? `<button class="btn-primary" style="background:#7c3aed;" onclick="starteStufenDuell(${kapStufe})">⚔️ Stufen-Duell gegen Computer!</button>` : ""}
         <button class="btn-primary" onclick="zeigeKapitel(${kapId})">Weiter im Kapitel</button>
         <button class="btn-ghost" onclick="zeigeStartseite()">Zur Startseite</button>
       </div>
     </div>`;
 }
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  zeigeStartseite();
-});
