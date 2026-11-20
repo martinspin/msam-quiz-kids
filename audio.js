@@ -220,10 +220,7 @@ const appMusik = (() => {
   let aktiv = false;
   let imSpiel = false;
   let pfadIndex = 0;
-  const pfade = Array.of(
-    "sounds/hintergrund.mp3",
-    "sounds/hintergrund.mp3"
-  );
+  const pfade = Array.of("sounds/hintergrund.mp3");
 
   const audio = new Audio();
   audio.loop = true;
