@@ -445,7 +445,7 @@ async function zeigeMsamRangliste() {
   }
 }
 
-// === STERNE & CLOUD-STAND BEIM SEITENSTART GARANTIEREN ===
+// === STERNE & CLOUD-STAND AUTOMATISCH SYNCHRONISIEREN ===
 window.addEventListener("DOMContentLoaded", async () => {
   try {
     const profil = ladeMsamProfil();
@@ -463,4 +463,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (e) {}
 });
+
+window.addEventListener("load", () => {
+  if (typeof ladeMsamProfil === "function" && ladeMsamProfil()) {
+    synchronisiereFortschrittMitCloud();
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && typeof ladeMsamProfil === "function" && ladeMsamProfil()) {
+    synchronisiereFortschrittMitCloud();
+  }
+});
+
 
