@@ -12,7 +12,7 @@
       <span class="logo-icon">🎶</span>
       <span class="logo-text" style="text-transform:lowercase;">msam quiz kids</span>
     </div>
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
       <button id="music-toggle-btn" class="btn-ghost" onclick="if(typeof appMusik !== 'undefined') appMusik.toggle()" title="Hintergrundmusik an/aus">
         🎵 Musik
       </button>
@@ -20,6 +20,9 @@
         <span>⭐</span>
         <span id="star-count">0</span>
       </div>
+      <button id="logout-btn" class="btn-ghost" onclick="abmeldenMsamKind()" title="Abmelden / Profil wechseln" style="border-color:#fca5a5; color:#b91c1c;">
+        🚪 Abmelden
+      </button>
     </div>
   </header>
 
@@ -41,7 +44,6 @@
   <script src="kapitel6.js"></script>
   <script src="kapitel7.js"></script>
   <script src="stufen_duell.js"></script>
-
 
   <!-- msam quiz kids Meisterschaft & App -->
   <script src="meisterschaft.js"></script>

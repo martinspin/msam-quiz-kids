@@ -62,6 +62,20 @@ function speichereMsamProfil(profil) {
   } catch (e) {}
 }
 
+function abmeldenMsamKind() {
+  try {
+    localStorage.removeItem("msamSchuelerProfil");
+    localStorage.removeItem("klavierEntdeckerFortschritt");
+  } catch (e) {}
+  const starEl = document.getElementById("star-count");
+  if (starEl) starEl.textContent = "0";
+  if (typeof zeigeMsamAnmeldung === "function") {
+    zeigeMsamAnmeldung(false);
+  } else {
+    location.reload();
+  }
+}
+
 function baueMsamStatusLeiste() {
   const profil = ladeMsamProfil();
   if (!profil) return "";
@@ -70,8 +84,10 @@ function baueMsamStatusLeiste() {
       <button class="btn-ghost" onclick="zeigeMsamRangliste(false)">🏆 Rangliste</button>
       <button class="btn-ghost" onclick="zeigeMsamAnmeldung(true)">✏️ Name / Lehrperson</button>
       <button class="btn-ghost" onclick="zeigeMsamLehrpersonenLogin()">👩‍🏫 Lehrpersonen</button>
+      <button class="btn-ghost" onclick="abmeldenMsamKind()" style="border-color:#fca5a5; color:#b91c1c;">🚪 Abmelden</button>
     </div>`;
 }
+
 
 async function msamSafeFirestorePatch(profil, body) {
   const docUrl = `${MSAM_FIRESTORE_URL}/${encodeURIComponent(profil.id)}`;
