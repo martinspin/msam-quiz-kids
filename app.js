@@ -453,3 +453,10 @@ function abschliessenSpiel(spielId, punkte, titel, text) {
       </div>
     </div>`;
 }
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", zeigeStartseite);
+} else {
+  zeigeStartseite();
+}
+
