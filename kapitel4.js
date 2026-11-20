@@ -313,7 +313,7 @@ function starteKap4Boss() {
     }
     if (idx >= fragen.length) {
       if (typeof starteFanfareUndKonfetti === "function") starteFanfareUndKonfetti(true);
-      abschliessenSpiel("kap4_boss", 250, "🎉 NOTENLESE-ENTDECKER! 🎉", "Du meisterst Linien, Zwischenräume, Schritte, Sprünge und Melodieverläufe wie ein Profi!");
+      abschliessenSpiel("kap4_5", 250, "🎉 NOTENLESE-ENTDECKER! 🎉", "Du meisterst Linien, Zwischenräume, Schritte, Sprünge und Melodieverläufe wie ein Profi!");
       return;
     }
 
