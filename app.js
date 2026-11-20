@@ -2,7 +2,7 @@
 
 const KAPITEL_DATEN = Array.of(
   {
-     id: 0,
+    id: 0,
     stufe: 1,
     titel: "1. Gehör & Klang-Entdecker",
     icon: "👂",
@@ -15,8 +15,6 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap0_5", titel: "1.4 Dur oder Moll?", punkte: 150, startFn: "starteKap0Spiel(4)" },
       { id: "kap0_boss", titel: "1.5 Boss-Challenge: Gehör-Meister", punkte: 250, startFn: "starteKap0Spiel(5)" }
     )
-
-
   },
   {
     id: 1,
@@ -64,33 +62,33 @@ const KAPITEL_DATEN = Array.of(
     )
   },
   {
-    id: 5,
-    stufe: 1,
-    titel: "5. Erste Lieder lesen",
-    icon: "🎵",
-    farbe: "#9333ea",
-    beschreibung: "Spiele echte Kinderlieder direkt vom Notenblatt auf dem Klavier!",
-    spiele: Array.of(
-      { id: "kap5_1", titel: "5.1 Alle meine Entchen", punkte: 140, startFn: "starteKap5Spiel(1)" },
-      { id: "kap5_2", titel: "5.2 Hänschen klein", punkte: 140, startFn: "starteKap5Spiel(2)" },
-      { id: "kap5_3", titel: "5.3 Summ, summ, summ", punkte: 150, startFn: "starteKap5Spiel(3)" },
-      { id: "kap5_4", titel: "5.4 Lieder-Quiz", punkte: 160, startFn: "starteKap5Spiel(4)" },
-      { id: "kap5_5", titel: "5.5 Konzert-Pianist", punkte: 200, startFn: "starteKap5Spiel(5)" }
-    )
-  },
-  {
     id: 6,
     stufe: 1,
-    titel: "6. Rhythmus & Notenwerte",
+    titel: "5. Rhythmus & Notenwerte",
     icon: "🥁",
     farbe: "#ea580c",
     beschreibung: "Viertel, Halbe und Ganze Noten: Klatsche und zähle den Takt wie ein Profi!",
     spiele: Array.of(
-      { id: "kap6_1", titel: "6.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap6Spiel(1)" },
-      { id: "kap6_2", titel: "6.2 Schläge zählen", punkte: 130, startFn: "starteKap6Spiel(2)" },
-      { id: "kap6_3", titel: "6.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap6Spiel(3)" },
-      { id: "kap6_4", titel: "6.4 Takt-Baumeister", punkte: 160, startFn: "starteKap6Spiel(4)" },
-      { id: "kap6_5", titel: "6.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap6Spiel(5)" }
+      { id: "kap6_1", titel: "5.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap6Spiel(1)" },
+      { id: "kap6_2", titel: "5.2 Schläge zählen", punkte: 130, startFn: "starteKap6Spiel(2)" },
+      { id: "kap6_3", titel: "5.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap6Spiel(3)" },
+      { id: "kap6_4", titel: "5.4 Takt-Baumeister", punkte: 160, startFn: "starteKap6Spiel(4)" },
+      { id: "kap6_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap6Spiel(5)" }
+    )
+  },
+  {
+    id: 5,
+    stufe: 1,
+    titel: "6. Erste Lieder lesen",
+    icon: "🎵",
+    farbe: "#9333ea",
+    beschreibung: "Spiele echte Kinderlieder direkt vom Notenblatt auf dem Klavier!",
+    spiele: Array.of(
+      { id: "kap5_1", titel: "6.1 Alle meine Entchen", punkte: 140, startFn: "starteKap5Spiel(1)" },
+      { id: "kap5_2", titel: "6.2 Hänschen klein", punkte: 140, startFn: "starteKap5Spiel(2)" },
+      { id: "kap5_3", titel: "6.3 Summ, summ, summ", punkte: 150, startFn: "starteKap5Spiel(3)" },
+      { id: "kap5_4", titel: "6.4 Lieder-Quiz", punkte: 160, startFn: "starteKap5Spiel(4)" },
+      { id: "kap5_5", titel: "6.5 Konzert-Pianist", punkte: 200, startFn: "starteKap5Spiel(5)" }
     )
   },
   {
