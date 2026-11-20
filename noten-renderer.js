@@ -10,7 +10,7 @@ function renderNotenSystem(containerId, config) {
   } = config;
 
   const breite = 640;
-  const hoehe = 210;
+  const hoehe = 215;
   const mitteY = 108;
   const linienAbstand = 22;
 
@@ -36,14 +36,14 @@ function renderNotenSystem(containerId, config) {
     const anker =
       schluessel === "violin"
         ? [
-            { stufe: -2, name: "c'", farbe: "#2563eb", x: 112, hilfe: true },
-            { stufe: 2, name: "g'", farbe: "#f97316", x: 145, hilfe: false },
-            { stufe: 5, name: "c''", farbe: "#9333ea", x: 178, hilfe: false }
+            { stufe: -2, name: "c'", farbe: "#2563eb", x: 116, hilfe: true },
+            { stufe: 2, name: "g'", farbe: "#f97316", x: 150, hilfe: false },
+            { stufe: 5, name: "c''", farbe: "#9333ea", x: 184, hilfe: false }
           ]
         : [
-            { stufe: 3, name: "c", farbe: "#9333ea", x: 112, hilfe: false },
-            { stufe: 6, name: "f", farbe: "#f97316", x: 145, hilfe: false },
-            { stufe: 10, name: "c'", farbe: "#2563eb", x: 178, hilfe: true }
+            { stufe: 3, name: "c", farbe: "#9333ea", x: 116, hilfe: false },
+            { stufe: 6, name: "f", farbe: "#f97316", x: 150, hilfe: false },
+            { stufe: 10, name: "c'", farbe: "#2563eb", x: 184, hilfe: true }
           ];
 
     anker.forEach((a) => {
@@ -56,15 +56,15 @@ function renderNotenSystem(containerId, config) {
     });
   }
 
-  // Dein eigenes SVG-Symbol links einbinden (mit Text-Fallback)
+  // Dein eigenes SVG-Symbol links einbinden (exakt auf die Linien kalibriert)
   if (schluessel === "violin") {
-    svg += `<image href="violin.svg" x="28" y="34" width="54" height="142" />`;
+    svg += `<image href="violin.svg" x="22" y="19" width="81" height="180" preserveAspectRatio="xMidYMid meet" />`;
   } else {
-    svg += `<image href="bass.svg" x="30" y="56" width="52" height="92" />`;
+    svg += `<image href="bass.svg" x="30" y="56" width="52" height="92" preserveAspectRatio="xMidYMid meet" />`;
   }
 
   // Spiel-Noten zeichnen
-  const linksOffset = zeigeSpickzettel ? 220 : 120;
+  const linksOffset = zeigeSpickzettel ? 226 : 124;
   const verfuegbar = breite - linksOffset - 60;
 
   noten.forEach((note, idx) => {

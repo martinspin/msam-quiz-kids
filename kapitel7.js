@@ -1,14 +1,14 @@
-// 1/3 KAPITEL 7: Violinschlüssel bis g'' (mit noten-renderer.js & klaviatur.js)
+// 1/4 KAPITEL 7: Violinschlüssel bis g'' (exaktes violin.svg wie in Kapitel 6)
 
 const VIOLIN_NOTEN_KAP7 = Array.of(
-  { id: "g1", stufe: 2, ton: "G", label: "g'", midi: 67, merkspruch: "Schlüssel-g' liegt auf der 2. Linie (Schnecken-Linie)!" },
-  { id: "a1", stufe: 3, ton: "A", label: "a'", midi: 69, merkspruch: "Das a' wohnt im 2. Zwischenraum!" },
-  { id: "h1", stufe: 4, ton: "H", label: "h'", midi: 71, merkspruch: "Das h' liegt genau auf der 3. Linie (Mittel-Linie)!" },
-  { id: "c2", stufe: 5, ton: "C", label: "c''", midi: 72, merkspruch: "Das zweigestrichene c'' wohnt im 3. Zwischenraum!" },
-  { id: "d2", stufe: 6, ton: "D", label: "d''", midi: 74, merkspruch: "Das zweigestrichene d'' liegt auf der 4. Linie!" },
-  { id: "e2", stufe: 7, ton: "E", label: "e''", midi: 76, merkspruch: "Das zweigestrichene e'' wohnt ganz oben im 4. Zwischenraum!" },
-  { id: "f2", stufe: 8, ton: "F", label: "f''", midi: 77, merkspruch: "Das zweigestrichene f'' liegt ganz oben auf der 5. Linie (Dach-Linie)!" },
-  { id: "g2", stufe: 9, ton: "G", label: "g''", midi: 79, merkspruch: "Das zweigestrichene g'' sitzt oben AUF dem Dach (über der 5. Linie)!" }
+  { id: "g1", stufe: 4, ton: "G", label: "g'", midi: 67, merkspruch: "Schlüssel-g' liegt auf der 2. Linie (Schnecken-Linie)!" },
+  { id: "a1", stufe: 5, ton: "A", label: "a'", midi: 69, merkspruch: "Das a' wohnt im 2. Zwischenraum!" },
+  { id: "h1", stufe: 6, ton: "H", label: "h'", midi: 71, merkspruch: "Das h' liegt genau auf der 3. Linie (Mittel-Linie)!" },
+  { id: "c2", stufe: 7, ton: "C", label: "c''", midi: 72, merkspruch: "Das zweigestrichene c'' wohnt im 3. Zwischenraum!" },
+  { id: "d2", stufe: 8, ton: "D", label: "d''", midi: 74, merkspruch: "Das zweigestrichene d'' liegt auf der 4. Linie!" },
+  { id: "e2", stufe: 9, ton: "E", label: "e''", midi: 76, merkspruch: "Das zweigestrichene e'' wohnt ganz oben im 4. Zwischenraum!" },
+  { id: "f2", stufe: 10, ton: "F", label: "f''", midi: 77, merkspruch: "Das zweigestrichene f'' liegt ganz oben auf der 5. Linie (Dach-Linie)!" },
+  { id: "g2", stufe: 11, ton: "G", label: "g''", midi: 79, merkspruch: "Das zweigestrichene g'' sitzt oben AUF dem Dach (über der 5. Linie)!" }
 );
 
 function mischeZufallKap7(liste) {
@@ -20,6 +20,48 @@ function mischeZufallKap7(liste) {
     kopie.splice(j, 1, temp);
   }
   return kopie;
+}
+
+function baueViolinSystemKap7SVG(notenListe) {
+  const anzahl = notenListe.length;
+  const breite = Math.max(340, 145 + anzahl * 66);
+  const hoehe = 195;
+  const untersteLinieY = 140;
+  const halbSchrittY = 10;
+
+  const linienSVG = Array.of(2, 4, 6, 8, 10).map((st) => {
+    const y = untersteLinieY - (st - 2) * halbSchrittY;
+    return `<line x1="22" y1="${y}" x2="${breite - 22}" y2="${y}" stroke="#334155" stroke-width="2.3" stroke-linecap="round" />`;
+  }).join("");
+
+  const schluesselSVG = `<image href="violin.svg" x="22" y="19" width="74" height="164" preserveAspectRatio="xMidYMid meet" />`;
+  const startX = 128;
+  const abstandX = anzahl <= 2 ? 90 : 62;
+
+  const notenSVG = notenListe.map((n, i) => {
+    const cx = startX + i * abstandX;
+    const cy = untersteLinieY - (n.stufe - 2) * halbSchrittY;
+    const farbe = n.farbe || "#0f172a";
+    const halsNachUnten = n.stufe >= 6;
+    const aktivRing = n.aktiv
+      ? `<circle cx="${cx}" cy="${cy}" r="20" fill="rgba(219, 39, 119, 0.2)" stroke="#db2777" stroke-width="2.5" />`
+      : "";
+    const hals = halsNachUnten
+      ? `<line x1="${cx - 11.5}" y1="${cy + 2}" x2="${cx - 11.5}" y2="${cy + 46}" stroke="${farbe}" stroke-width="3" stroke-linecap="round" />`
+      : `<line x1="${cx + 11.5}" y1="${cy - 2}" x2="${cx + 11.5}" y2="${cy - 46}" stroke="${farbe}" stroke-width="3" stroke-linecap="round" />`;
+    const kopf = `<ellipse cx="${cx}" cy="${cy}" rx="12.5" ry="9" transform="rotate(-16 ${cx} ${cy})" fill="${farbe}" />`;
+    const labelOben = n.label
+      ? `<text x="${cx}" y="24" text-anchor="middle" font-size="17" font-weight="900" fill="${farbe}">${n.label}</text>`
+      : "";
+    return `<g>${aktivRing}${hals}${kopf}${labelOben}</g>`;
+  }).join("");
+
+  return `
+    <div style="display:flex; justify-content:center; margin:8px 0;">
+      <svg viewBox="0 0 ${breite} ${hoehe}" style="width:100%; max-width:${Math.min(breite + 40, 620)}px; height:auto; background:#fdf2f8; border:2px solid #fbcfe8; border-radius:18px;">
+        ${linienSVG}${schluesselSVG}${notenSVG}
+      </svg>
+    </div>`;
 }
 
 function midiZuDeutschLabelKap7(midi) {
@@ -61,7 +103,6 @@ function starteKap7Spiel(nummer) {
   if (nummer === 4) starteKap7MelodienTonraum();
   if (nummer === 5) starteKap7HoehenflugMeister();
 }
-
 // 7.1 Anker-Töne oben (c'' – e'' – g'') – 10 Runden
 function starteKap7AnkerOben() {
   const anker = VIOLIN_NOTEN_KAP7.filter((n) => Array.of("c2", "e2", "g2").includes(n.id));
@@ -72,7 +113,7 @@ function starteKap7AnkerOben() {
   ));
   let idx = 0;
 
-  const render = (hinweis = "Welcher obere Anker-Ton (c'', e'' oder g'') leuchtet hier?") => {
+  const render = (hinweis = "Welcher obere Anker-Ton (c'', e'' oder g'') steht hier?") => {
     if (idx >= runden.length) {
       abschliessenSpiel("kap7_1", 160, "Höhen-Navigator!", "c'' (3. Raum), e'' (4. Raum) und g'' (auf dem Dach) sitzen bombenfest!");
       return;
@@ -85,16 +126,10 @@ function starteKap7AnkerOben() {
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
         <div class="quiz-meta"><span>7.1 Anker-Töne oben (c'' – e'' – g'')</span><span>${idx + 1} / ${runden.length}</span></div>
-        <div id="kap7-noten-box" style="margin:10px 0;"></div>
+        ${baueViolinSystemKap7SVG(Array.of({ stufe: ziel.stufe, farbe: "#db2777" }))}
         <p class="quiz-hint">${hinweis}</p>
         <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:14px;">${buttonsHTML}</div>
       </div>`;
-
-    renderNotenSystem("kap7-noten-box", {
-      schluessel: "violin",
-      noten: Array.of({ stufe: ziel.stufe, farbe: "#db2777" }),
-      zeigeSpickzettel: true
-    });
   };
 
   window.checkKap7Anker = (wahl) => {
@@ -110,9 +145,10 @@ function starteKap7AnkerOben() {
   };
   render();
 }
+
 // 7.2 Alle Noten von h' bis g'' sicher benennen – 10 Runden
 function starteKap7AlleNotenOben() {
-  const pool = VIOLIN_NOTEN_KAP7.filter((n) => n.stufe >= 4);
+  const pool = VIOLIN_NOTEN_KAP7.filter((n) => n.stufe >= 6);
   const runden = mischeZufallKap7(Array.of(
     pool.at(0), pool.at(1), pool.at(2), pool.at(3), pool.at(4), pool.at(5),
     pool.at(1), pool.at(3), pool.at(4), pool.at(5)
@@ -131,17 +167,11 @@ function starteKap7AlleNotenOben() {
 
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>7.2 Alle Noten von g' bis g''</span><span>${idx + 1} / ${runden.length}</span></div>
-        <div id="kap7-noten-box" style="margin:10px 0;"></div>
+        <div class="quiz-meta"><span>7.2 Alle Noten von h' bis g''</span><span>${idx + 1} / ${runden.length}</span></div>
+        ${baueViolinSystemKap7SVG(Array.of({ stufe: ziel.stufe, farbe: "#db2777" }))}
         <p class="quiz-hint">${hinweis}</p>
         <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:14px;">${buttonsHTML}</div>
       </div>`;
-
-    renderNotenSystem("kap7-noten-box", {
-      schluessel: "violin",
-      noten: Array.of({ stufe: ziel.stufe, farbe: "#db2777" }),
-      zeigeSpickzettel: false
-    });
   };
 
   window.checkKap7Name = (wahl) => {
@@ -157,10 +187,9 @@ function starteKap7AlleNotenOben() {
   };
   render();
 }
-
 // 7.3 Hohe Note auf dem Klavier finden – 10 Runden
 function starteKap7HoheNoteKlavier() {
-  const pool = VIOLIN_NOTEN_KAP7.filter((n) => n.stufe >= 4);
+  const pool = VIOLIN_NOTEN_KAP7.filter((n) => n.stufe >= 6);
   const runden = mischeZufallKap7(Array.of(
     pool.at(0), pool.at(1), pool.at(2), pool.at(3), pool.at(4), pool.at(5),
     pool.at(5), pool.at(3), pool.at(2), pool.at(1)
@@ -177,19 +206,13 @@ function starteKap7HoheNoteKlavier() {
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
         <div class="quiz-meta"><span>7.3 Hohe Note auf dem Klavier</span><span>${idx + 1} / ${runden.length}</span></div>
-        <div id="kap7-noten-box" style="margin:10px 0;"></div>
+        ${baueViolinSystemKap7SVG(Array.of({ stufe: ziel.stufe, farbe: "#0284c7" }))}
         <p class="quiz-hint">${hinweis}</p>
         <div id="kap7-klaviatur-box" style="margin-top:10px;"></div>
         <div style="font-size:12px; color:#64748b; margin-top:6px;">
           Links leuchtet c' (Schloss-c') · in der Mitte leuchtet das zweigestrichene c''
         </div>
       </div>`;
-
-    renderNotenSystem("kap7-noten-box", {
-      schluessel: "violin",
-      noten: Array.of({ stufe: ziel.stufe, farbe: "#0284c7" }),
-      zeigeSpickzettel: false
-    });
 
     zeigeKap7Klaviatur("kap7-klaviatur-box", (midi) => {
       const aktZiel = runden.at(idx);
@@ -211,6 +234,7 @@ function starteKap7HoheNoteKlavier() {
   };
   render();
 }
+
 // 7.4 Melodien im grossen Tonraum (g' bis g'') – 4 Melodien
 function starteKap7MelodienTonraum() {
   const lieder = Array.of(
@@ -218,55 +242,55 @@ function starteKap7MelodienTonraum() {
       titel: "🐦 Kuckuck, Kuckuck",
       startTipp: "Starte hoch auf dem g'' (oben AUF der 5. Linie) und springe hinunter zum e''!",
       noten: Array.of(
-        { stufe: 9, ton: "G", midi: 79, label: "g''" },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 9, ton: "G", midi: 79 },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 6, ton: "D", midi: 74 },
-        { stufe: 5, ton: "C", midi: 72 },
-        { stufe: 6, ton: "D", midi: 74 },
-        { stufe: 5, ton: "C", midi: 72 }
+        { stufe: 11, ton: "G", midi: 79, label: "g''" },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 11, ton: "G", midi: 79 },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 8, ton: "D", midi: 74 },
+        { stufe: 7, ton: "C", midi: 72 },
+        { stufe: 8, ton: "D", midi: 74 },
+        { stufe: 7, ton: "C", midi: 72 }
       )
     },
     {
       titel: "✨ Ode an die Freude (Obere Lage)",
       startTipp: "Starte auf dem hohen e'' (4. Zwischenraum) und klettere bis zum g''!",
       noten: Array.of(
-        { stufe: 7, ton: "E", midi: 76, label: "e''" },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 8, ton: "F", midi: 77 },
-        { stufe: 9, ton: "G", midi: 79 },
-        { stufe: 9, ton: "G", midi: 79 },
-        { stufe: 8, ton: "F", midi: 77 },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 6, ton: "D", midi: 74 },
-        { stufe: 5, ton: "C", midi: 72 }
+        { stufe: 9, ton: "E", midi: 76, label: "e''" },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 10, ton: "F", midi: 77 },
+        { stufe: 11, ton: "G", midi: 79 },
+        { stufe: 11, ton: "G", midi: 79 },
+        { stufe: 10, ton: "F", midi: 77 },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 8, ton: "D", midi: 74 },
+        { stufe: 7, ton: "C", midi: 72 }
       )
     },
     {
       titel: "🐝 Summ, summ, summ (Obere Lage)",
       startTipp: "Starte ganz oben auf dem zweigestrichenen g'' (auf dem Dach)!",
       noten: Array.of(
-        { stufe: 9, ton: "G", midi: 79, label: "g''" },
-        { stufe: 8, ton: "F", midi: 77 },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 6, ton: "D", midi: 74 },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 8, ton: "F", midi: 77 },
-        { stufe: 6, ton: "D", midi: 74 },
-        { stufe: 5, ton: "C", midi: 72 }
+        { stufe: 11, ton: "G", midi: 79, label: "g''" },
+        { stufe: 10, ton: "F", midi: 77 },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 8, ton: "D", midi: 74 },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 10, ton: "F", midi: 77 },
+        { stufe: 8, ton: "D", midi: 74 },
+        { stufe: 7, ton: "C", midi: 72 }
       )
     },
     {
       titel: "🔔 Glockengeläut (g' bis g'')",
       startTipp: "Vom g' auf der 2. Linie hoch zum c'', e'' und bis aufs Dach g''!",
       noten: Array.of(
-        { stufe: 2, ton: "G", midi: 67, label: "g'" },
-        { stufe: 5, ton: "C", midi: 72 },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 9, ton: "G", midi: 79 },
-        { stufe: 7, ton: "E", midi: 76 },
-        { stufe: 5, ton: "C", midi: 72 }
+        { stufe: 4, ton: "G", midi: 67, label: "g'" },
+        { stufe: 7, ton: "C", midi: 72 },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 11, ton: "G", midi: 79 },
+        { stufe: 9, ton: "E", midi: 76 },
+        { stufe: 7, ton: "C", midi: 72 }
       )
     }
   );
@@ -282,9 +306,10 @@ function starteKap7MelodienTonraum() {
     const lied = lieder.at(liedIdx);
     const text = hinweis || lied.startTipp;
 
-    const rendererNoten = lied.noten.map((n, i) => ({
+    const svgNoten = lied.noten.map((n, i) => ({
       stufe: n.stufe,
       farbe: i < schritt ? "#16a34a" : i === schritt ? "#db2777" : "#334155",
+      aktiv: i === schritt,
       label: n.label || ""
     }));
 
@@ -292,19 +317,13 @@ function starteKap7MelodienTonraum() {
       <div class="card" style="text-align:center;">
         <div class="quiz-meta"><span>7.4 Melodien im grossen Tonraum</span><span>Lied ${liedIdx + 1} / ${lieder.length}</span></div>
         <h2 style="margin-bottom:4px;">${lied.titel}</h2>
-        <div id="kap7-lied-noten" style="margin:10px 0;"></div>
+        ${baueViolinSystemKap7SVG(svgNoten)}
         <p class="quiz-hint">${text}</p>
         <div id="kap7-lied-klaviatur" style="margin-top:10px;"></div>
         <div style="font-size:12px; color:#64748b; margin-top:6px;">
           Links leuchtet c' · in der Mitte leuchtet c''
         </div>
       </div>`;
-
-    renderNotenSystem("kap7-lied-noten", {
-      schluessel: "violin",
-      noten: rendererNoten,
-      zeigeSpickzettel: false
-    });
 
     zeigeKap7Klaviatur("kap7-lied-klaviatur", (midi) => {
       const aktLied = lieder.at(liedIdx);
@@ -338,16 +357,16 @@ function starteKap7MelodienTonraum() {
 // 7.5 Abschluss-Challenge (ID "kap7_6" wie in KAPITEL_DATEN) – 10 Fragen
 function starteKap7HoehenflugMeister() {
   const fragen = mischeZufallKap7(Array.of(
-    { modus: "name", stufe: 5, ton: "C", label: "c''", midi: 72 },
-    { modus: "name", stufe: 9, ton: "G", label: "g''", midi: 79 },
-    { modus: "name", stufe: 7, ton: "E", label: "e''", midi: 76 },
-    { modus: "name", stufe: 4, ton: "H", label: "h'", midi: 71 },
-    { modus: "name", stufe: 8, ton: "F", label: "f''", midi: 77 },
-    { modus: "klavier", stufe: 5, ton: "C", label: "c''", midi: 72 },
-    { modus: "klavier", stufe: 9, ton: "G", label: "g''", midi: 79 },
-    { modus: "klavier", stufe: 6, ton: "D", label: "d''", midi: 74 },
-    { modus: "klavier", stufe: 8, ton: "F", label: "f''", midi: 77 },
-    { modus: "klavier", stufe: 7, ton: "E", label: "e''", midi: 76 }
+    { modus: "name", stufe: 7, ton: "C", label: "c''", midi: 72 },
+    { modus: "name", stufe: 11, ton: "G", label: "g''", midi: 79 },
+    { modus: "name", stufe: 9, ton: "E", label: "e''", midi: 76 },
+    { modus: "name", stufe: 6, ton: "H", label: "h'", midi: 71 },
+    { modus: "name", stufe: 10, ton: "F", label: "f''", midi: 77 },
+    { modus: "klavier", stufe: 7, ton: "C", label: "c''", midi: 72 },
+    { modus: "klavier", stufe: 11, ton: "G", label: "g''", midi: 79 },
+    { modus: "klavier", stufe: 8, ton: "D", label: "d''", midi: 74 },
+    { modus: "klavier", stufe: 10, ton: "F", label: "f''", midi: 77 },
+    { modus: "klavier", stufe: 9, ton: "E", label: "e''", midi: 76 }
   ));
 
   let idx = 0;
@@ -379,30 +398,18 @@ function starteKap7HoehenflugMeister() {
       document.getElementById("main-content").innerHTML = `
         <div class="card" style="text-align:center;">
           <div class="quiz-meta"><span>🚀 Challenge ${idx + 1} / ${fragen.length}</span><span>${herzen}</span></div>
-          <div id="kap7-meister-noten" style="margin:10px 0;"></div>
+          ${baueViolinSystemKap7SVG(Array.of({ stufe: akt.stufe, farbe: "#db2777" }))}
           <p class="quiz-hint">${hinweis || "Wie heisst diese hohe Note?"}</p>
           <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:14px;">${btns}</div>
         </div>`;
-
-      renderNotenSystem("kap7-meister-noten", {
-        schluessel: "violin",
-        noten: Array.of({ stufe: akt.stufe, farbe: "#db2777" }),
-        zeigeSpickzettel: false
-      });
     } else {
       document.getElementById("main-content").innerHTML = `
         <div class="card" style="text-align:center;">
           <div class="quiz-meta"><span>🚀 Challenge ${idx + 1} / ${fragen.length}</span><span>${herzen}</span></div>
-          <div id="kap7-meister-noten" style="margin:10px 0;"></div>
+          ${baueViolinSystemKap7SVG(Array.of({ stufe: akt.stufe, farbe: "#0284c7" }))}
           <p class="quiz-hint">${hinweis || "Tippe die richtige Taste in der zweigestrichenen Oktave an!"}</p>
           <div id="kap7-meister-klaviatur" style="margin-top:10px;"></div>
         </div>`;
-
-      renderNotenSystem("kap7-meister-noten", {
-        schluessel: "violin",
-        noten: Array.of({ stufe: akt.stufe, farbe: "#0284c7" }),
-        zeigeSpickzettel: false
-      });
 
       zeigeKap7Klaviatur("kap7-meister-klaviatur", (midi) => {
         const zielFrage = fragen.at(idx);
