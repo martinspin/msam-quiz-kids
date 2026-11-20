@@ -4,91 +4,91 @@ const KAPITEL_DATEN = Array.of(
   {
     id: 0,
     stufe: 1,
-    titel: "0. Gehör & Klang-Entdecker",
+    titel: "1. Gehör & Klang-Entdecker",
     icon: "👂",
     farbe: "#f59e0b",
     beschreibung: "Hoch oder tief? Laut oder leise? Lang oder kurz? Trainiere deine Ohren!",
     spiele: Array.of(
-      { id: "kap0_1", titel: "0.1 Hoch oder tief?", punkte: 100, startFn: "starteKap0Spiel(1)" },
-      { id: "kap0_2", titel: "0.2 Laut oder leise?", punkte: 100, startFn: "starteKap0Spiel(2)" },
-      { id: "kap0_3", titel: "0.3 Lang oder kurz?", punkte: 100, startFn: "starteKap0Spiel(3)" },
-      { id: "kap0_4", titel: "0.4 Aufwärts oder abwärts?", punkte: 120, startFn: "starteKap0Spiel(4)" },
-      { id: "kap0_5", titel: "0.5 Ohren-Detektiv", punkte: 150, startFn: "starteKap0Spiel(5)" }
+      { id: "kap0_1", titel: "1.1 Hoch oder tief?", punkte: 100, startFn: "starteKap0Spiel(1)" },
+      { id: "kap0_2", titel: "1.2 Laut oder leise?", punkte: 100, startFn: "starteKap0Spiel(2)" },
+      { id: "kap0_3", titel: "1.3 Lang oder kurz?", punkte: 100, startFn: "starteKap0Spiel(3)" },
+      { id: "kap0_4", titel: "1.4 Aufwärts oder abwärts?", punkte: 120, startFn: "starteKap0Spiel(4)" },
+      { id: "kap0_5", titel: "1.5 Ohren-Detektiv", punkte: 150, startFn: "starteKap0Spiel(5)" }
     )
   },
   {
     id: 1,
     stufe: 1,
-    titel: "1. Die 7 Stammtöne",
+    titel: "2. Die 7 Stammtöne",
     icon: "🔤",
     farbe: "#e11d48",
     beschreibung: "C, D, E, F, G, A, H – lerne das musikalische Alphabet vorwärts und rückwärts!",
     spiele: Array.of(
-      { id: "kap1_1", titel: "1.1 Der nächste Ton", punkte: 100, startFn: "starteKap1Spiel(1)" },
-      { id: "kap1_2", titel: "1.2 Der Ton davor", punkte: 100, startFn: "starteKap1Spiel(2)" },
-      { id: "kap1_3", titel: "1.3 Tonleiter sortieren", punkte: 120, startFn: "starteKap1Spiel(3)" },
-      { id: "kap1_4", titel: "1.4 Lücken-Füller", punkte: 120, startFn: "starteKap1Spiel(4)" },
-      { id: "kap1_5", titel: "1.5 Stammton-Meister", punkte: 160, startFn: "starteKap1Spiel(5)" }
+      { id: "kap1_1", titel: "2.1 Der nächste Ton", punkte: 100, startFn: "starteKap1Spiel(1)" },
+      { id: "kap1_2", titel: "2.2 Der Ton davor", punkte: 100, startFn: "starteKap1Spiel(2)" },
+      { id: "kap1_3", titel: "2.3 Tonleiter sortieren", punkte: 120, startFn: "starteKap1Spiel(3)" },
+      { id: "kap1_4", titel: "2.4 Lücken-Füller", punkte: 120, startFn: "starteKap1Spiel(4)" },
+      { id: "kap1_5", titel: "2.5 Stammton-Meister", punkte: 160, startFn: "starteKap1Spiel(5)" }
     )
   },
   {
     id: 2,
     stufe: 1,
-    titel: "2. Klaviatur-Entdecker",
+    titel: "3. Klaviatur-Entdecker",
     icon: "🎹",
     farbe: "#0284c7",
     beschreibung: "Zwillinge und Drillinge: Finde jeden Ton blind auf den weissen Tasten!",
     spiele: Array.of(
-      { id: "kap2_1", titel: "2.1 Zwillinge & Drillinge", punkte: 100, startFn: "starteKap2Spiel(1)" },
-      { id: "kap2_2", titel: "2.2 Wo wohnt das C?", punkte: 100, startFn: "starteKap2Spiel(2)" },
-      { id: "kap2_3", titel: "2.3 Alle weissen Tasten", punkte: 130, startFn: "starteKap2Spiel(3)" },
-      { id: "kap2_4", titel: "2.4 Tasten-Echo", punkte: 140, startFn: "starteKap2Spiel(4)" },
-      { id: "kap2_5", titel: "2.5 Klaviatur-Champion", punkte: 180, startFn: "starteKap2Spiel(5)" }
+      { id: "kap2_1", titel: "3.1 Zwillinge & Drillinge", punkte: 100, startFn: "starteKap2Spiel(1)" },
+      { id: "kap2_2", titel: "3.2 Wo wohnt das C?", punkte: 100, startFn: "starteKap2Spiel(2)" },
+      { id: "kap2_3", titel: "3.3 Alle weissen Tasten", punkte: 130, startFn: "starteKap2Spiel(3)" },
+      { id: "kap2_4", titel: "3.4 Tasten-Echo", punkte: 140, startFn: "starteKap2Spiel(4)" },
+      { id: "kap2_5", titel: "3.5 Klaviatur-Champion", punkte: 180, startFn: "starteKap2Spiel(5)" }
     )
   },
   {
     id: 4,
     stufe: 1,
-    titel: "3. Violinschlüssel (c' bis g')",
+    titel: "4. Violinschlüssel (c' bis g')",
     icon: "🎼",
     farbe: "#16a34a",
     beschreibung: "Linien und Zwischenräume: Lies die ersten 5 Töne vom Schloss-c' bis zum g'!",
     spiele: Array.of(
-      { id: "kap4_1", titel: "3.1 Linie oder Zwischenraum?", punkte: 100, startFn: "starteKap4Spiel(1)" },
-      { id: "kap4_2", titel: "3.2 Schloss-c' und Schlüssel-g'", punkte: 120, startFn: "starteKap4Spiel(2)" },
-      { id: "kap4_3", titel: "3.3 Alle 5 Noten (c'–g')", punkte: 140, startFn: "starteKap4Spiel(3)" },
-      { id: "kap4_4", titel: "3.4 Note auf dem Klavier", punkte: 150, startFn: "starteKap4Spiel(4)" },
-      { id: "kap4_5", titel: "3.5 Notenlese-Profi", punkte: 180, startFn: "starteKap4Spiel(5)" }
+      { id: "kap4_1", titel: "4.1 Linie oder Zwischenraum?", punkte: 100, startFn: "starteKap4Spiel(1)" },
+      { id: "kap4_2", titel: "4.2 Schloss-c' und Schlüssel-g'", punkte: 120, startFn: "starteKap4Spiel(2)" },
+      { id: "kap4_3", titel: "4.3 Alle 5 Noten (c'–g')", punkte: 140, startFn: "starteKap4Spiel(3)" },
+      { id: "kap4_4", titel: "4.4 Note auf dem Klavier", punkte: 150, startFn: "starteKap4Spiel(4)" },
+      { id: "kap4_5", titel: "4.5 Notenlese-Profi", punkte: 180, startFn: "starteKap4Spiel(5)" }
     )
   },
   {
     id: 5,
     stufe: 1,
-    titel: "4. Erste Lieder lesen",
+    titel: "5. Erste Lieder lesen",
     icon: "🎵",
     farbe: "#9333ea",
     beschreibung: "Spiele echte Kinderlieder direkt vom Notenblatt auf dem Klavier!",
     spiele: Array.of(
-      { id: "kap5_1", titel: "4.1 Alle meine Entchen", punkte: 140, startFn: "starteKap5Spiel(1)" },
-      { id: "kap5_2", titel: "4.2 Hänschen klein", punkte: 140, startFn: "starteKap5Spiel(2)" },
-      { id: "kap5_3", titel: "4.3 Summ, summ, summ", punkte: 150, startFn: "starteKap5Spiel(3)" },
-      { id: "kap5_4", titel: "4.4 Lieder-Quiz", punkte: 160, startFn: "starteKap5Spiel(4)" },
-      { id: "kap5_5", titel: "4.5 Konzert-Pianist", punkte: 200, startFn: "starteKap5Spiel(5)" }
+      { id: "kap5_1", titel: "5.1 Alle meine Entchen", punkte: 140, startFn: "starteKap5Spiel(1)" },
+      { id: "kap5_2", titel: "5.2 Hänschen klein", punkte: 140, startFn: "starteKap5Spiel(2)" },
+      { id: "kap5_3", titel: "5.3 Summ, summ, summ", punkte: 150, startFn: "starteKap5Spiel(3)" },
+      { id: "kap5_4", titel: "5.4 Lieder-Quiz", punkte: 160, startFn: "starteKap5Spiel(4)" },
+      { id: "kap5_5", titel: "5.5 Konzert-Pianist", punkte: 200, startFn: "starteKap5Spiel(5)" }
     )
   },
   {
     id: 6,
     stufe: 1,
-    titel: "5. Rhythmus & Notenwerte",
+    titel: "6. Rhythmus & Notenwerte",
     icon: "🥁",
     farbe: "#ea580c",
     beschreibung: "Viertel, Halbe und Ganze Noten: Klatsche und zähle den Takt wie ein Profi!",
     spiele: Array.of(
-      { id: "kap6_1", titel: "5.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap6Spiel(1)" },
-      { id: "kap6_2", titel: "5.2 Schläge zählen", punkte: 130, startFn: "starteKap6Spiel(2)" },
-      { id: "kap6_3", titel: "5.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap6Spiel(3)" },
-      { id: "kap6_4", titel: "5.4 Takt-Baumeister", punkte: 160, startFn: "starteKap6Spiel(4)" },
-      { id: "kap6_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap6Spiel(5)" }
+      { id: "kap6_1", titel: "6.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap6Spiel(1)" },
+      { id: "kap6_2", titel: "6.2 Schläge zählen", punkte: 130, startFn: "starteKap6Spiel(2)" },
+      { id: "kap6_3", titel: "6.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap6Spiel(3)" },
+      { id: "kap6_4", titel: "6.4 Takt-Baumeister", punkte: 160, startFn: "starteKap6Spiel(4)" },
+      { id: "kap6_5", titel: "6.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap6Spiel(5)" }
     )
   },
   {
@@ -122,6 +122,7 @@ const KAPITEL_DATEN = Array.of(
     )
   }
 );
+
 // 2/3 APP.JS: Fortschritts-Speicher & Startseite (mit Auto-Schliessen erledigter Stufen)
 
 function speicherSchluessel() {
