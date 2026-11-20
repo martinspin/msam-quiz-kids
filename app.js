@@ -442,7 +442,7 @@ function abschliessenSpiel(spielId, punkte, titel, text) {
         +${neu ? punkte : Math.round(punkte / 4)} ⭐ gesammelt!
       </div>
       <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-        ${kapitelKomplett && kapId % 6 === 0 ? `<button class="btn-primary" style="background:#7c3aed;" onclick="starteStufenDuell(${Math.ceil(kapId / 6)})">⚔️ Stufen-Duell gegen Computer!</button>` : ""}
+        ${kapitelKomplett && (kapId + 1) % 6 === 0 ? `<button class="btn-primary" style="background:#7c3aed;" onclick="starteStufenDuell(${Math.floor(kapId / 6) + 1})">⚔️ Stufen-Duell gegen Computer!</button>` : ""}
         <button class="btn-primary" onclick="zeigeKapitel(${kapId})">Weiter im Kapitel</button>
         <button class="btn-ghost" onclick="zeigeStartseite()">Zur Startseite</button>
       </div>
