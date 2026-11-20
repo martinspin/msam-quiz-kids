@@ -51,7 +51,7 @@ function starteKap0Spiel(nummer) {
   if (nummer === 5) starteKap0Boss();
 }
 
-// 1.1 Steigt oder fällt die Melodie?
+// 1.1 Steigt oder fällt die Melodie? (10 Aufgaben)
 function starteKap0MelodieRichtung() {
   const aufgaben = mischeZufallKap0(Array.of(
     { toene: Array.of(60, 64, 67), typ: "hoch" },
@@ -107,7 +107,7 @@ function starteKap0MelodieRichtung() {
   render();
 }
 
-// 1.2 Schritt oder grosser Sprung?
+// 1.2 Schritt oder grosser Sprung? (10 Aufgaben)
 function starteKap0SchrittSprung() {
   const aufgaben = mischeZufallKap0(Array.of(
     { m1: 60, m2: 62, typ: "schritt" },
@@ -148,7 +148,6 @@ function starteKap0SchrittSprung() {
     document.getElementById("kap0-play-btn").onclick = spieleAktuell;
     spieleAktuell();
   };
-
   window.checkKap0SS = (wahl) => {
     const akt = aufgaben.at(idx);
     if (wahl === akt.typ) {
@@ -162,7 +161,8 @@ function starteKap0SchrittSprung() {
   };
   render();
 }
-// 1.3 Staccato (hüpfend) oder Legato (gleitend)?
+
+// 1.3 Staccato (hüpfend) oder Legato (gleitend)? (10 Aufgaben)
 function starteKap0StaccatoLegato() {
   const aufgaben = mischeZufallKap0(Array.of(
     { toene: Array.of(60, 62, 64, 65), typ: "staccato" },
@@ -172,7 +172,9 @@ function starteKap0StaccatoLegato() {
     { toene: Array.of(64, 67, 72, 67), typ: "staccato" },
     { toene: Array.of(64, 67, 72, 67), typ: "legato" },
     { toene: Array.of(72, 69, 65, 60), typ: "staccato" },
-    { toene: Array.of(72, 69, 65, 60), typ: "legato" }
+    { toene: Array.of(72, 69, 65, 60), typ: "legato" },
+    { toene: Array.of(62, 66, 69, 74), typ: "staccato" },
+    { toene: Array.of(65, 69, 72, 77), typ: "legato" }
   ));
   let idx = 0;
 
@@ -220,7 +222,7 @@ function starteKap0StaccatoLegato() {
   render();
 }
 
-// 1.4 Dur (fröhlich) oder Moll (nachdenklich)?
+// 1.4 Dur (fröhlich) oder Moll (nachdenklich)? (10 Aufgaben)
 function starteKap0DurMoll() {
   const aufgaben = mischeZufallKap0(Array.of(
     { toene: Array.of(60, 64, 67), typ: "dur" },
@@ -230,7 +232,9 @@ function starteKap0DurMoll() {
     { toene: Array.of(67, 71, 74), typ: "dur" },
     { toene: Array.of(64, 67, 71), typ: "moll" },
     { toene: Array.of(62, 66, 69), typ: "dur" },
-    { toene: Array.of(69, 72, 76), typ: "moll" }
+    { toene: Array.of(69, 72, 76), typ: "moll" },
+    { toene: Array.of(64, 68, 71), typ: "dur" },
+    { toene: Array.of(65, 68, 72), typ: "moll" }
   ));
   let idx = 0;
 
@@ -272,7 +276,6 @@ function starteKap0DurMoll() {
   };
   render();
 }
-
 // 1.5 Boss-Challenge: Gehör-Meister (10 gemischte Höraufgaben)
 function starteKap0Boss() {
   const fragen = mischeZufallKap0(Array.of(

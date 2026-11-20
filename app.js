@@ -16,7 +16,7 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap0_boss", titel: "1.5 Boss-Challenge: Gehör-Meister", punkte: 250, startFn: "starteKap0Spiel(5)" }
     )
   },
-  {
+   {
     id: 1,
     stufe: 1,
     titel: "2. Die 7 Stammtöne",
@@ -24,26 +24,26 @@ const KAPITEL_DATEN = Array.of(
     farbe: "#e11d48",
     beschreibung: "C, D, E, F, G, A, H – lerne das musikalische Alphabet vorwärts und rückwärts!",
     spiele: Array.of(
-      { id: "kap1_1", titel: "2.1 Der nächste Ton", punkte: 100, startFn: "starteKap1Spiel(1)" },
-      { id: "kap1_2", titel: "2.2 Der Ton davor", punkte: 100, startFn: "starteKap1Spiel(2)" },
-      { id: "kap1_3", titel: "2.3 Tonleiter sortieren", punkte: 120, startFn: "starteKap1Spiel(3)" },
-      { id: "kap1_4", titel: "2.4 Lücken-Füller", punkte: 120, startFn: "starteKap1Spiel(4)" },
-      { id: "kap1_5", titel: "2.5 Stammton-Meister", punkte: 160, startFn: "starteKap1Spiel(5)" }
+      { id: "kap1_1", titel: "2.1 Ordne die Töne", punkte: 120, startFn: "starteKap1Spiel(1)" },
+      { id: "kap1_2", titel: "2.2 Stammton oder nicht?", punkte: 120, startFn: "starteKap1Spiel(2)" },
+      { id: "kap1_3", titel: "2.3 Finde den Nachbarn", punkte: 140, startFn: "starteKap1Spiel(3)" },
+      { id: "kap1_4", titel: "2.4 Lücken-Detektiv", punkte: 140, startFn: "starteKap1Spiel(4)" },
+      { id: "kap1_6", titel: "2.5 Stammtöne-Meister", punkte: 200, startFn: "starteKap1Spiel(6)" }
     )
   },
-  {
+ {
     id: 2,
     stufe: 1,
     titel: "3. Klaviatur-Entdecker",
     icon: "🎹",
-    farbe: "#0284c7",
-    beschreibung: "Zwillinge und Drillinge: Finde jeden Ton blind auf den weissen Tasten!",
+    farbe: "#d97706",
+    beschreibung: "Zwillinge, Drillinge und alle weissen Tasten – werde zum echten Tasten-Profi!",
     spiele: Array.of(
-      { id: "kap2_1", titel: "3.1 Zwillinge & Drillinge", punkte: 100, startFn: "starteKap2Spiel(1)" },
-      { id: "kap2_2", titel: "3.2 Wo wohnt das C?", punkte: 100, startFn: "starteKap2Spiel(2)" },
-      { id: "kap2_3", titel: "3.3 Alle weissen Tasten", punkte: 130, startFn: "starteKap2Spiel(3)" },
-      { id: "kap2_4", titel: "3.4 Tasten-Echo", punkte: 140, startFn: "starteKap2Spiel(4)" },
-      { id: "kap2_5", titel: "3.5 Klaviatur-Champion", punkte: 180, startFn: "starteKap2Spiel(5)" }
+      { id: "kap2_1", titel: "3.1 Zwillinge & Drillinge", punkte: 120, startFn: "starteKap2Spiel(1)" },
+      { id: "kap2_2", titel: "3.2 C – D – E an den Zwillingen", punkte: 140, startFn: "starteKap2Spiel(2)" },
+      { id: "kap2_3", titel: "3.3 F – G – A – H an den Drillingen", punkte: 140, startFn: "starteKap2Spiel(3)" },
+      { id: "kap2_4", titel: "3.4 Welche Taste leuchtet?", punkte: 150, startFn: "starteKap2Spiel(4)" },
+      { id: "kap2_6", titel: "3.5 Klaviertasten-Meister", punkte: 250, startFn: "starteKap2Spiel(6)" }
     )
   },
   {
