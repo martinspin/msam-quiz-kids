@@ -170,15 +170,54 @@ async function synchronisiereFortschrittMitCloud() {
     } catch (e) {}
   });
 
+  // 1. Zuerst den aktuellen Stand aus Firebase abrufen (Zwei-Wege-Sync)
+  let cloudSterne = 0;
+  let cloudErledigt = [];
+  try {
+    const getRes = await fetch(`${MSAM_FIRESTORE_URL}/${profil.id}`);
+    if (getRes.ok) {
+      const doc = await getRes.json();
+      const f = doc.fields || {};
+      if (f.sterne && f.sterne.integerValue) {
+        cloudSterne = Number(f.sterne.integerValue) || 0;
+      }
+      if (f.erledigt && f.erledigt.arrayValue && Array.isArray(f.erledigt.arrayValue.values)) {
+        cloudErledigt = f.erledigt.arrayValue.values
+          .map((v) => v.stringValue)
+          .filter(Boolean);
+      }
+    }
+  } catch (e) {
+    console.warn("Cloud-Abruf fehlgeschlagen, nutze lokalen Stand:", e);
+  }
+
+  // 2. Immer den höheren Sternestand & alle erledigten Spiele zusammenführen
+  const besteSterne = Math.max(lokaleSterne, cloudSterne);
+  const alleErledigt = Array.from(new Set([...lokaleErledigt, ...cloudErledigt]));
+
+  // 3. Zusammengeführten Stand lokal auf diesem Gerät speichern & Anzeige aktualisieren
+  const neuerStand = { sterne: besteSterne, erledigt: alleErledigt };
+  leseSchluessel.forEach((key) => {
+    try {
+      const altRoh = localStorage.getItem(key);
+      const altObj = altRoh ? JSON.parse(altRoh) : {};
+      localStorage.setItem(key, JSON.stringify({ ...altObj, ...neuerStand }));
+    } catch (e) {}
+  });
+
+  const starEl = document.getElementById("star-count");
+  if (starEl) starEl.textContent = String(besteSterne);
+
+  // 4. Zusammengeführten Stand sicher in Firebase speichern
   const body = {
     fields: {
       vorname: { stringValue: profil.vorname },
       nachname: { stringValue: profil.nachname },
       lehrpersonId: { stringValue: profil.lehrpersonId },
       lehrpersonName: { stringValue: profil.lehrpersonName },
-      sterne: { integerValue: String(lokaleSterne) },
-      erledigtAnzahl: { integerValue: String(lokaleErledigt.length) },
-      erledigt: { arrayValue: { values: lokaleErledigt.map((id) => ({ stringValue: String(id) })) } },
+      sterne: { integerValue: String(besteSterne) },
+      erledigtAnzahl: { integerValue: String(alleErledigt.length) },
+      erledigt: { arrayValue: { values: alleErledigt.map((id) => ({ stringValue: String(id) })) } },
       letztesSpiel: { stringValue: new Date().toISOString() }
     }
   };
@@ -406,8 +445,8 @@ async function zeigeMsamRangliste() {
   }
 }
 
-// === STERNE-ANZEIGE BEIM SEITENSTART GARANTIEREN ===
-window.addEventListener("DOMContentLoaded", () => {
+// === STERNE & CLOUD-STAND BEIM SEITENSTART GARANTIEREN ===
+window.addEventListener("DOMContentLoaded", async () => {
   try {
     const profil = ladeMsamProfil();
     const key = profil ? `msam_quizkids_stand_${profil.id}` : "klavierEntdeckerFortschritt";
@@ -419,5 +458,9 @@ window.addEventListener("DOMContentLoaded", () => {
         starEl.textContent = String(daten.sterne);
       }
     }
+    if (profil) {
+      await synchronisiereFortschrittMitCloud();
+    }
   } catch (e) {}
 });
+
