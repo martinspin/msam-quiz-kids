@@ -52,13 +52,13 @@ function spieleStaccatoFolgeKap0(notenListe, abstandMs = 380) {
 
 function starteKap0Spiel(nummer) {
   if (typeof appMusik !== "undefined") appMusik.stop();
-  if (nummer === 1) starteKap0HochTief();
-  if (nummer === 2) starteKap0MelodieRichtung();
-  if (nummer === 3) starteKap0SchrittSprung();
-  if (nummer === 4) starteKap0StaccatoLegato();
-  if (nummer === 5) starteKap0DurMoll();
-  if (nummer === 6) starteKap0Boss();
+  if (nummer === 1) starteKap0MelodieRichtung();
+  if (nummer === 2) starteKap0SchrittSprung();
+  if (nummer === 3) starteKap0StaccatoLegato();
+  if (nummer === 4) starteKap0DurMoll();
+  if (nummer === 5) starteKap0Boss();
 }
+
 
 // 1.1 Hoch oder tief? (Vogel vs. Bär)
 function starteKap0HochTief() {
