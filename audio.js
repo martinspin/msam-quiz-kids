@@ -1,6 +1,24 @@
-// msam quiz kids: Verzögerungsfreie Steinway-Audio-Engine (Web Audio Buffer)
+// msam quiz kids: Verzögerungsfreie Steinway-Audio-Engine + zentrale Lautstärke-Steuerung
+
+const AUDIO_PEGEL = {
+  klavier: 0.95,       // Spieltöne beim Antippen (klar & deutlich)
+  songMp3: 0.32,       // Suno-Song-Tracks in Rhythmus-Spielen (angenehm im Hintergrund)
+  sprachMp3: 0.42,     // Sprachausgabe-MP3s (nicht zu laut)
+  hintergrund: 0.25,   // Menü-Hintergrundmusik
+  fanfare: 0.50        // Abschluss-Fanfare
+};
+
+// Passt auch Browser-Vorlesestimme (speechSynthesis) automatisch auf angenehme Lautstärke an
+if (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speak) {
+  const _origSpeak = window.speechSynthesis.speak.bind(window.speechSynthesis);
+  window.speechSynthesis.speak = (utterance) => {
+    if (utterance) utterance.volume = Math.min(utterance.volume ?? 1, AUDIO_PEGEL.sprachMp3);
+    return _origSpeak(utterance);
+  };
+}
 
 let _msamAudioCtx = null;
+const _aktiveQuellen = new Set();
 
 function holeAudioContext() {
   if (!_msamAudioCtx) {
@@ -20,7 +38,6 @@ const STEINWAY_ANKER = Array.of(
   { midi: 72, dateiname: "Piano.mf.C5.m4a", buffer: null, startOffset: 0 }
 );
 
-// Schneidet automatische Stille am Anfang der Aufnahme weg, damit der Ton sofort einsetzt
 function findeKlangStartSekunden(audioBuffer) {
   const daten = audioBuffer.getChannelData(0);
   const schwelle = 0.008;
@@ -68,7 +85,7 @@ function findeBestenSteinwayAnker(zielMidi) {
   return bester;
 }
 
-function spieleMidi(midi, dauerSek = 1.3, lautstaerke = 0.95) {
+function spieleMidi(midi, dauerSek = 1.3, lautstaerke = AUDIO_PEGEL.klavier) {
   if (!midi) return;
   const ctx = holeAudioContext();
 
@@ -96,12 +113,15 @@ function spieleMidi(midi, dauerSek = 1.3, lautstaerke = 0.95) {
     quelle.connect(gain);
     gain.connect(ctx.destination);
 
+    const eintrag = { quelle, gain };
+    _aktiveQuellen.add(eintrag);
+    quelle.onended = () => _aktiveQuellen.delete(eintrag);
+
     quelle.start(jetzt, anker.startOffset);
     quelle.stop(jetzt + gesamtDauer + 0.05);
     return;
   }
 
-  // Fallback nur für den allerersten Klick, falls das Dekodieren noch 100ms dauert
   const klang = new Audio(`sounds/${anker.dateiname}`);
   klang.volume = Math.min(1, Math.max(0.2, lautstaerke));
   if ("preservesPitch" in klang) klang.preservesPitch = false;
@@ -111,11 +131,24 @@ function spieleMidi(midi, dauerSek = 1.3, lautstaerke = 0.95) {
   klang.play().catch(() => {});
 }
 
-function spieleTon(midi, dauerSek = 1.3, lautstaerke = 0.95) {
+function stopAlleToene() {
+  const ctx = holeAudioContext();
+  const jetzt = ctx.currentTime;
+  _aktiveQuellen.forEach((eintrag) => {
+    try {
+      eintrag.gain.gain.cancelScheduledValues(jetzt);
+      eintrag.gain.gain.setValueAtTime(Math.max(0.001, eintrag.gain.gain.value), jetzt);
+      eintrag.gain.gain.exponentialRampToValueAtTime(0.0001, jetzt + 0.04);
+      eintrag.quelle.stop(jetzt + 0.05);
+    } catch (e) {}
+  });
+  _aktiveQuellen.clear();
+}
+function spieleTon(midi, dauerSek = 1.3, lautstaerke = AUDIO_PEGEL.klavier) {
   spieleMidi(midi, dauerSek, lautstaerke);
 }
 
-function spieleFrequenz(freq, dauerSek = 1.1, lautstaerke = 0.95) {
+function spieleFrequenz(freq, dauerSek = 1.1, lautstaerke = AUDIO_PEGEL.klavier) {
   if (!freq) return;
   const midi = Math.round(69 + 12 * Math.log2(freq / 440));
   spieleMidi(midi, dauerSek, lautstaerke);
@@ -155,13 +188,50 @@ function spieleFehler() {
   setTimeout(() => spieleMidi(52, 0.85, 0.85), 170);
 }
 
+// Zentraler Player für Suno-Song-MP3s (automatisch ausbalancierte Lautstärke)
+let _aktSongMp3 = null;
+
+function ladeSongMp3(pfad, lautstaerke = AUDIO_PEGEL.songMp3) {
+  stopSongMp3();
+  _aktSongMp3 = new Audio(pfad);
+  _aktSongMp3.volume = lautstaerke;
+  _aktSongMp3.preload = "auto";
+  return _aktSongMp3;
+}
+
+function stopSongMp3() {
+  if (_aktSongMp3) {
+    _aktSongMp3.pause();
+    _aktSongMp3.currentTime = 0;
+    _aktSongMp3 = null;
+  }
+}
+
+// Zentraler Player für Sprachausgabe-MP3s (nicht zu laut)
+let _aktSprachMp3 = null;
+
+function spieleSprachMp3(pfad, lautstaerke = AUDIO_PEGEL.sprachMp3) {
+  if (_aktSprachMp3) {
+    _aktSprachMp3.pause();
+    _aktSprachMp3.currentTime = 0;
+  }
+  _aktSprachMp3 = new Audio(pfad);
+  _aktSprachMp3.volume = lautstaerke;
+  _aktSprachMp3.play().catch(() => {});
+  return _aktSprachMp3;
+}
+
 const klavierAudio = {
   spieleMidi,
   spieleTon,
   spieleFrequenz,
   spieleQuietsch,
   spieleErfolg,
-  spieleFehler
+  spieleFehler,
+  stopAlle: stopAlleToene,
+  ladeSongMp3,
+  stopSongMp3,
+  spieleSprachMp3
 };
 
 window._istBossChallenge = false;
@@ -172,7 +242,7 @@ function starteFanfareUndKonfetti(erzwingen = false) {
   setTimeout(() => {
     try {
       const fanfareAudio = new Audio("sounds/fanfare.mp3");
-      fanfareAudio.volume = 0.75;
+      fanfareAudio.volume = AUDIO_PEGEL.fanfare;
       const p = fanfareAudio.play();
       if (p && typeof p.catch === "function") {
         p.catch(() => {
@@ -215,7 +285,6 @@ function starteFanfareUndKonfetti(erzwingen = false) {
   }, 150);
 }
 
-
 const appMusik = (() => {
   let aktiv = false;
   let imSpiel = false;
@@ -224,7 +293,7 @@ const appMusik = (() => {
 
   const audio = new Audio();
   audio.loop = true;
-  audio.volume = 0.35;
+  audio.volume = AUDIO_PEGEL.hintergrund;
   audio.preload = "auto";
   audio.src = pfade.at(0);
 
@@ -262,6 +331,7 @@ const appMusik = (() => {
     },
     stop() {
       imSpiel = true;
+      stopSongMp3();
       audio.pause();
       audio.currentTime = 0;
     },
@@ -288,7 +358,6 @@ function toggleBgMusic() {
   appMusik.toggle();
 }
 
-// Samples sofort beim Laden der Seite und beim ersten Klick vorladen
 window.addEventListener("DOMContentLoaded", () => {
   ladeAlleSteinwaySamples();
 });

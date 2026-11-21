@@ -1,4 +1,4 @@
-// kapitel5.js – Stufe 1, Kapitel 5: Rhythmus & Notenwerte (Süssigkeiten + taktgenauer Song-Track)
+// kapitel5.js – Stufe 1, Kapitel 5: Rhythmus & Notenwerte (nutzt zentrale audio.js)
 function mischeZufallKap5(arr) {
   const kopie = arr.slice();
   for (let i = kopie.length - 1; i > 0; i--) {
@@ -51,7 +51,8 @@ function starteKap5Spiel(nummer) {
   if (nummer === 4) starteKap5SongTrackLangeNoten();
   if (nummer === 5 || nummer === 6) starteKap5Boss();
 }
-// 5.1 Süssigkeiten-Notenwerte kennenlernen (10 Runden)
+
+// 5.1 Süssigkeiten-Notenwerte kennenlernen
 function starteKap5Notenwerte() {
   const fragen = mischeZufallKap5(Array.of(
     { bild: Array.of({ typ: "v", dauer: 1, wort: "" }), frage: "Wie heisst diese Note (1 Schlag)?", antwort: "da", opt: Array.of("da|1️⃣ da", "bon-bon|2️⃣ bon-bon") },
@@ -93,7 +94,48 @@ function starteKap5Notenwerte() {
   render();
 }
 
-// Song-Track-Engine (MP3 mit Browser-Autoplay-Entsperrung + Klavier-Fallback + Gedrückthalten)
+// 5.2 Schläge zusammenzählen
+function starteKap5Zaehlen() {
+  const runden = mischeZufallKap5(Array.of(
+    { bild: Array.of({ typ: "v", dauer: 1, wort: "da" }, { typ: "v", dauer: 1, wort: "da" }), antwort: "2" },
+    { bild: Array.of({ typ: "h", dauer: 2, wort: "bon-bon" }, { typ: "v", dauer: 1, wort: "da" }), antwort: "3" },
+    { bild: Array.of({ typ: "g", dauer: 4, wort: "gum-mi-bärch-en" }), antwort: "4" },
+    { bild: Array.of({ typ: "ph", dauer: 3, wort: "kau-gum-mi" }), antwort: "3" },
+    { bild: Array.of({ typ: "h", dauer: 2, wort: "bon-bon" }, { typ: "h", dauer: 2, wort: "bon-bon" }), antwort: "4" },
+    { bild: Array.of({ typ: "v", dauer: 1, wort: "da" }, { typ: "vp", dauer: 1, wort: "sch" }), antwort: "2" },
+    { bild: Array.of({ typ: "ph", dauer: 3, wort: "kau-gum-mi" }, { typ: "v", dauer: 1, wort: "da" }), antwort: "4" },
+    { bild: Array.of({ typ: "v", dauer: 1, wort: "da" }, { typ: "h", dauer: 2, wort: "bon-bon" }), antwort: "3" },
+    { bild: Array.of({ typ: "v", dauer: 1, wort: "da" }, { typ: "vp", dauer: 1, wort: "sch" }, { typ: "h", dauer: 2, wort: "bon-bon" }), antwort: "4" },
+    { bild: Array.of({ typ: "h", dauer: 2, wort: "bon-bon" }), antwort: "2" }
+  ));
+  let idx = 0;
+
+  const render = (hinweis = "") => {
+    if (idx >= runden.length) {
+      abschliessenSpiel("kap5_2", 120, "Takt-Meister!", "Du zählst 2er-, 3er- und 4er-Takte im Schlaf zusammen!");
+      return;
+    }
+    const akt = runden.at(idx);
+    document.getElementById("main-content").innerHTML = `
+      <div class="card" style="text-align:center;">
+        <div class="quiz-meta"><span>5.2 Schläge zusammenzählen</span><span>${idx + 1} / ${runden.length}</span></div>
+        ${baueKap5RhythmusSVG(akt.bild, "")}
+        <p class="quiz-hint">${hinweis || "Wie viele Schläge hat dieser Takt insgesamt?"}</p>
+        <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:16px;">
+          <button class="answer-btn" style="background:#fef3c7; border-color:#f59e0b; color:#78350f;" onclick="checkKap5_2('2')">2️⃣ 2 Schläge (2/4)</button>
+          <button class="answer-btn" style="background:#dcfce7; border-color:#16a34a; color:#14532d;" onclick="checkKap5_2('3')">3️⃣ 3 Schläge (3/4)</button>
+          <button class="answer-btn" style="background:#e0f2fe; border-color:#0284c7; color:#0c4a6e;" onclick="checkKap5_2('4')">4️⃣ 4 Schläge (4/4)</button>
+        </div>
+      </div>`;
+  };
+
+  window.checkKap5_2 = (wahl) => {
+    if (wahl === runden.at(idx).antwort) { klavierAudio.spieleMidi(69, 0.35); idx++; render("Perfekt gezählt! ✅"); }
+    else { klavierAudio.spieleQuietsch(); render("Tipp: Zähle einfach alle Silben unter den Noten zusammen!"); }
+  };
+  render();
+}
+// Gemeinsame Song-Track-Engine (nutzt klavierAudio.ladeSongMp3 & stopSongMp3 aus audio.js)
 function starteKap5SongTrackEngine(cfg) {
   let songIdx = 0, animId = null, aktiv = false, startZeit = 0, notenListe = Array.of();
   let gedrueckt = false, aktiveNote = null, aktAudio = null;
@@ -107,7 +149,8 @@ function starteKap5SongTrackEngine(cfg) {
   const stopSong = () => {
     aktiv = false;
     stopTon();
-    if (aktAudio) { aktAudio.pause(); aktAudio.currentTime = 0; aktAudio = null; }
+    if (typeof klavierAudio !== "undefined" && klavierAudio.stopSongMp3) klavierAudio.stopSongMp3();
+    aktAudio = null;
     if (animId) cancelAnimationFrame(animId);
   };
 
@@ -125,9 +168,7 @@ function starteKap5SongTrackEngine(cfg) {
     const gesamtBeats = beat + 1;
 
     if (song.mp3) {
-      aktAudio = new Audio(song.mp3);
-      aktAudio.volume = 0.85;
-      aktAudio.preload = "auto";
+      aktAudio = klavierAudio.ladeSongMp3(song.mp3, song.volume);
       const offsetMs = song.offsetMs || 0;
 
       for (let b = 0; b < vorlauf; b++) {
@@ -173,6 +214,7 @@ function starteKap5SongTrackEngine(cfg) {
         }, b * beatMs);
       }
     }
+
     startZeit = performance.now();
     aktiv = true;
 
@@ -243,7 +285,6 @@ function starteKap5SongTrackEngine(cfg) {
     };
     animId = requestAnimationFrame(loop);
   };
-
   const renderUI = (msg = "") => {
     const song = cfg.songs.at(songIdx);
     const vorlauf = song.vorlauf ?? song.takt;
@@ -305,8 +346,7 @@ function starteKap5SongTrackViertel() {
     onFertig: () => abschliessenSpiel("kap5_3", 140, "5-Song-Champion! 🥁", "Alle 5 Songs im 3/4- und 4/4-Takt gemeistert!")
   });
 }
-
-// 5.4 Lange Noten (bon-bon, kau-gum-mi, gum-mi-bärch-en)
+// 5.4 Lange Noten (inkl. sounds/dancepop_76bpm.mp3 über zentrale audio.js)
 function starteKap5SongTrackLangeNoten() {
   starteKap5SongTrackEngine({
     svgId: "kap5-svg-4", msgId: "kap5-msg-4", padId: "kap5-pad-4", tapFnName: "tapKap5LangeNoten",
@@ -319,7 +359,7 @@ function starteKap5SongTrackLangeNoten() {
         bpm: 76,
         mp3: "sounds/dancepop_76bpm.mp3",
         vorlauf: 4,
-        offsetMs: 3158,
+        offsetMs: 2960,
         hatIntro: true,
         seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" })
       },
@@ -332,7 +372,7 @@ function starteKap5SongTrackLangeNoten() {
   });
 }
 
-// 5.5 Boss-Challenge: 5 Blitz-Checks + 3 Boss-Songs
+// 5.5 Boss-Challenge
 function starteKap5Boss() {
   const aufgaben = mischeZufallKap5(Array.of(
     { bild: Array.of({ typ: "g", dauer: 4, wort: "" }), frage: "Boss-Check 1/5: Wie heisst dieses 4-Schlag-Wort?", antwort: "gum-mi-bärch-en", opt: Array.of("gum-mi-bärch-en|4️⃣ gum-mi-bärch-en", "kau-gum-mi|3️⃣ kau-gum-mi") },
@@ -348,7 +388,7 @@ function starteKap5Boss() {
       starteKap5SongTrackEngine({
         svgId: "kap5-svg-boss", msgId: "kap5-msg-boss", padId: "kap5-pad-boss", tapFnName: "tapKap5Boss", beatMs: 860,
         zoneFill: "#fef3c7", zoneStroke: "#d97706", btnBorder: "#d97706", btnBg: "linear-gradient(135deg,#f59e0b,#b45309)", btnShadow: "#78350f",
-        btnLabel: "🏆 BOSS-TAP! (oder Leertaste)",
+        btnLabel: "🏆 DRÜCKEN & HALTEN!",
         songs: Array.of(
           { titel: "5.5 Boss-Song 1: Süssigkeiten-Mix", takt: 4, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "h", d: 2, w: "bon-bon" }, { t: "vp", d: 1, w: "sch" }, { t: "ph", d: 3, w: "kau-gum-mi" }, { t: "v", d: 1, w: "da" }) },
           { titel: "5.5 Boss-Song 2: Kaugummi-Walzer", takt: 3, seq: Array.of({ t: "ph", d: 3, w: "kau-gum-mi" }, { t: "h", d: 2, w: "bon-bon" }, { t: "vp", d: 1, w: "sch" }) },
