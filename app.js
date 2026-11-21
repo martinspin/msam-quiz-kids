@@ -94,21 +94,22 @@ const KAPITEL_DATEN = Array.of(
     )
   },
 
-  {
+    {
     id: 7,
     stufe: 2,
-    titel: "7. Violinschlüssel bis g''",
-    icon: "🚀",
-    farbe: "#db2777",
-    beschreibung: "Hoch hinaus: Lerne h', c'', d'', e'', f'' und das zweigestrichene g'' auf dem Dach!",
+    titel: "7. Gehörbildung Aufbau",
+    icon: "🎧",
+    farbe: "#0284c7",
+    beschreibung: "Einzelton oder Zusammenklang, Schritte & Sprünge, Kuckuck, Feuerwehrhorn und Echo-Spiel!",
     spiele: Array.of(
-      { id: "kap7_1", titel: "7.1 Anker-Töne oben (c''–e''–g'')", punkte: 160, startFn: "starteKap7Spiel(1)" },
-      { id: "kap7_2", titel: "7.2 Alle Noten von g' bis g''", punkte: 180, startFn: "starteKap7Spiel(2)" },
-      { id: "kap7_3", titel: "7.3 Hohe Note auf dem Klavier", punkte: 200, startFn: "starteKap7Spiel(3)" },
-      { id: "kap7_4", titel: "7.4 Melodien im grossen Tonraum", punkte: 230, startFn: "starteKap7Spiel(4)" },
-      { id: "kap7_6", titel: "7.5 Höhenflug-Meister", punkte: 250, startFn: "starteKap7Spiel(5)" }
+      { id: "kap7_1", titel: "7.1 Einzelton oder Zusammenklang?", punkte: 140, startFn: "starteKap7Spiel(1)" },
+      { id: "kap7_2", titel: "7.2 Kleiner Schritt oder grosser Sprung?", punkte: 160, startFn: "starteKap7Spiel(2)" },
+      { id: "kap7_3", titel: "7.3 Kuckuck oder Feuerwehrhorn?", punkte: 180, startFn: "starteKap7Spiel(3)" },
+      { id: "kap7_4", titel: "7.4 Echo-Spiel (Melodie nachtippen)", punkte: 200, startFn: "starteKap7Spiel(4)" },
+      { id: "kap7_5", titel: "7.5 Boss-Challenge: Ohren-Profi", punkte: 240, startFn: "starteKap7Spiel(5)" }
     )
   },
+
   {
     id: 8,
     stufe: 2,

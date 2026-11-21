@@ -1,444 +1,317 @@
-// 1/4 KAPITEL 7: Violinschlüssel bis g'' (exaktes violin.svg wie in Kapitel 6)
-
-const VIOLIN_NOTEN_KAP7 = Array.of(
-  { id: "g1", stufe: 4, ton: "G", label: "g'", midi: 67, merkspruch: "Schlüssel-g' liegt auf der 2. Linie (Schnecken-Linie)!" },
-  { id: "a1", stufe: 5, ton: "A", label: "a'", midi: 69, merkspruch: "Das a' wohnt im 2. Zwischenraum!" },
-  { id: "h1", stufe: 6, ton: "H", label: "h'", midi: 71, merkspruch: "Das h' liegt genau auf der 3. Linie (Mittel-Linie)!" },
-  { id: "c2", stufe: 7, ton: "C", label: "c''", midi: 72, merkspruch: "Das zweigestrichene c'' wohnt im 3. Zwischenraum!" },
-  { id: "d2", stufe: 8, ton: "D", label: "d''", midi: 74, merkspruch: "Das zweigestrichene d'' liegt auf der 4. Linie!" },
-  { id: "e2", stufe: 9, ton: "E", label: "e''", midi: 76, merkspruch: "Das zweigestrichene e'' wohnt ganz oben im 4. Zwischenraum!" },
-  { id: "f2", stufe: 10, ton: "F", label: "f''", midi: 77, merkspruch: "Das zweigestrichene f'' liegt ganz oben auf der 5. Linie (Dach-Linie)!" },
-  { id: "g2", stufe: 11, ton: "G", label: "g''", midi: 79, merkspruch: "Das zweigestrichene g'' sitzt oben AUF dem Dach (über der 5. Linie)!" }
-);
-
-function mischeZufallKap7(liste) {
-  const kopie = liste.slice();
+// kapitel7.js – Stufe 2, Kapitel 1: Gehörbildung Aufbau (ab 8 Jahren)
+function mischeZufallKap7(arr) {
+  const kopie = arr.slice();
   for (let i = kopie.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const temp = kopie.at(i);
-    kopie.splice(i, 1, kopie.at(j));
-    kopie.splice(j, 1, temp);
+    [kopie[i], kopie[j]] = [kopie[j], kopie[i]];
   }
   return kopie;
 }
 
-function baueViolinSystemKap7SVG(notenListe) {
-  const anzahl = notenListe.length;
-  const breite = Math.max(340, 145 + anzahl * 66);
-  const hoehe = 195;
-  const untersteLinieY = 140;
-  const halbSchrittY = 10;
-
-  const linienSVG = Array.of(2, 4, 6, 8, 10).map((st) => {
-    const y = untersteLinieY - (st - 2) * halbSchrittY;
-    return `<line x1="22" y1="${y}" x2="${breite - 22}" y2="${y}" stroke="#334155" stroke-width="2.3" stroke-linecap="round" />`;
-  }).join("");
-
-  const schluesselSVG = `<image href="violin.svg" x="22" y="19" width="74" height="164" preserveAspectRatio="xMidYMid meet" />`;
-  const startX = 128;
-  const abstandX = anzahl <= 2 ? 90 : 62;
-
-  const notenSVG = notenListe.map((n, i) => {
-    const cx = startX + i * abstandX;
-    const cy = untersteLinieY - (n.stufe - 2) * halbSchrittY;
-    const farbe = n.farbe || "#0f172a";
-    const halsNachUnten = n.stufe >= 6;
-    const aktivRing = n.aktiv
-      ? `<circle cx="${cx}" cy="${cy}" r="20" fill="rgba(219, 39, 119, 0.2)" stroke="#db2777" stroke-width="2.5" />`
-      : "";
-    const hals = halsNachUnten
-      ? `<line x1="${cx - 11.5}" y1="${cy + 2}" x2="${cx - 11.5}" y2="${cy + 46}" stroke="${farbe}" stroke-width="3" stroke-linecap="round" />`
-      : `<line x1="${cx + 11.5}" y1="${cy - 2}" x2="${cx + 11.5}" y2="${cy - 46}" stroke="${farbe}" stroke-width="3" stroke-linecap="round" />`;
-    const kopf = `<ellipse cx="${cx}" cy="${cy}" rx="12.5" ry="9" transform="rotate(-16 ${cx} ${cy})" fill="${farbe}" />`;
-    const labelOben = n.label
-      ? `<text x="${cx}" y="24" text-anchor="middle" font-size="17" font-weight="900" fill="${farbe}">${n.label}</text>`
-      : "";
-    return `<g>${aktivRing}${hals}${kopf}${labelOben}</g>`;
-  }).join("");
-
-  return `
-    <div style="display:flex; justify-content:center; margin:8px 0;">
-      <svg viewBox="0 0 ${breite} ${hoehe}" style="width:100%; max-width:${Math.min(breite + 40, 620)}px; height:auto; background:#fdf2f8; border:2px solid #fbcfe8; border-radius:18px;">
-        ${linienSVG}${schluesselSVG}${notenSVG}
-      </svg>
-    </div>`;
-}
-
-function midiZuDeutschLabelKap7(midi) {
-  const namen = Array.of("c", "cis", "d", "dis", "e", "f", "fis", "g", "gis", "a", "ais", "h");
-  const rest = midi % 12;
-  const oktave = Math.floor(midi / 12) - 1;
-  const basis = namen.at(rest);
-  if (oktave === 4) return `${basis}'`;
-  if (oktave === 5) return `${basis}''`;
-  return basis;
-}
-
-function midiZuStammtonKap7(midi) {
-  const namen = Array.of("C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "Ais", "H");
-  return namen.at(midi % 12);
-}
-
-function zeigeKap7Klaviatur(containerId, onKeyClick) {
-  baueKlaviatur(containerId, {
-    startMidi: 60,
-    endMidi: 83,
-    highlightMidis: Array.of(60, 72),
-    zeigeNotennamen: false,
-    onKeyClick: onKeyClick
-  });
+function spieleKap7Klang(toene, gleichzeitig = false, abstandMs = 620) {
+  if (typeof klavierAudio === "undefined") return;
+  if (gleichzeitig) {
+    toene.forEach((midi) => klavierAudio.spieleMidi(midi, 1.1));
+  } else {
+    toene.forEach((midi, i) => {
+      setTimeout(() => klavierAudio.spieleMidi(midi, 0.75), i * abstandMs);
+    });
+  }
 }
 
 function starteKap7Spiel(nummer) {
-  if (typeof appMusik !== "undefined") {
-    if (typeof appMusik.pause === "function") appMusik.pause();
-    if (typeof appMusik.stop === "function") appMusik.stop();
-  }
-  const bgAudio = document.getElementById("bg-music");
-  if (bgAudio) bgAudio.pause();
-
-  if (nummer === 1) starteKap7AnkerOben();
-  if (nummer === 2) starteKap7AlleNotenOben();
-  if (nummer === 3) starteKap7HoheNoteKlavier();
-  if (nummer === 4) starteKap7MelodienTonraum();
-  if (nummer === 5) starteKap7HoehenflugMeister();
+  if (typeof appMusik !== "undefined") appMusik.stop();
+  if (nummer === 1) starteKap7EinzelOderAkkord();
+  if (nummer === 2) starteKap7SchrittOderSprung();
+  if (nummer === 3) starteKap7KuckuckFeuerwehr();
+  if (nummer === 4) starteKap7EchoSpiel();
+  if (nummer === 5 || nummer === 6) starteKap7Boss();
 }
-// 7.1 Anker-Töne oben (c'' – e'' – g'') – 10 Runden
-function starteKap7AnkerOben() {
-  const anker = VIOLIN_NOTEN_KAP7.filter((n) => Array.of("c2", "e2", "g2").includes(n.id));
+
+// 7.1 Einzelton oder Zusammenklang? (10 Runden)
+function starteKap7EinzelOderAkkord() {
   const runden = mischeZufallKap7(Array.of(
-    anker.at(0), anker.at(1), anker.at(2),
-    anker.at(0), anker.at(1), anker.at(2),
-    anker.at(2), anker.at(1), anker.at(0), anker.at(2)
+    { toene: Array.of(60), mehrstimmig: false },
+    { toene: Array.of(60, 64, 67), mehrstimmig: true },
+    { toene: Array.of(65), mehrstimmig: false },
+    { toene: Array.of(62, 65, 69), mehrstimmig: true },
+    { toene: Array.of(67), mehrstimmig: false },
+    { toene: Array.of(64, 67, 72), mehrstimmig: true },
+    { toene: Array.of(62), mehrstimmig: false },
+    { toene: Array.of(60, 67), mehrstimmig: true },
+    { toene: Array.of(69), mehrstimmig: false },
+    { toene: Array.of(65, 69, 72), mehrstimmig: true }
   ));
   let idx = 0;
 
-  const render = (hinweis = "Welcher obere Anker-Ton (c'', e'' oder g'') steht hier?") => {
+  const render = (hinweis = "Klingt hier nur ein einzelner Ton oder ein ganzer Zusammenklang?", autoPlay = true) => {
     if (idx >= runden.length) {
-      abschliessenSpiel("kap7_1", 160, "Höhen-Navigator!", "c'' (3. Raum), e'' (4. Raum) und g'' (auf dem Dach) sitzen bombenfest!");
+      abschliessenSpiel("kap7_1", 140, "Klang-Detektiv!", "Einzeltöne und volle Zusammenklänge unterscheidest du sofort!");
       return;
     }
-    const ziel = runden.at(idx);
-    const buttonsHTML = Array.of("C", "E", "G").map((t) => `
-      <button class="answer-btn" style="background:#fce7f3; border-color:#db2777; color:#831843; font-size:24px;"
-              onclick="checkKap7Anker('${t}')">${t}</button>`).join("");
+    const akt = runden.at(idx);
+    if (autoPlay) spieleKap7Klang(akt.toene, akt.mehrstimmig);
 
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>7.1 Anker-Töne oben (c'' – e'' – g'')</span><span>${idx + 1} / ${runden.length}</span></div>
-        ${baueViolinSystemKap7SVG(Array.of({ stufe: ziel.stufe, farbe: "#db2777" }))}
+        <div class="quiz-meta"><span>7.1 Einzelton oder Zusammenklang?</span><span>${idx + 1} / ${runden.length}</span></div>
+        <div style="margin:18px 0;">
+          <button class="answer-btn" style="background:#fef3c7; border-color:#f59e0b; color:#78350f; max-width:260px;"
+                  onclick="replayKap7_1()">🔊 Nochmals hören</button>
+        </div>
         <p class="quiz-hint">${hinweis}</p>
-        <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:14px;">${buttonsHTML}</div>
-      </div>`;
-  };
-
-  window.checkKap7Anker = (wahl) => {
-    const ziel = runden.at(idx);
-    klavierAudio.spieleMidi(ziel.midi);
-    if (wahl === ziel.ton) {
-      idx++;
-      render(`Super! Das ist das zweigestrichene ${ziel.label}! ✅`);
-    } else {
-      klavierAudio.spieleQuietsch();
-      render(`Merkspruch: ${ziel.merkspruch}`);
-    }
-  };
-  render();
-}
-
-// 7.2 Alle Noten von h' bis g'' sicher benennen – 10 Runden
-function starteKap7AlleNotenOben() {
-  const pool = VIOLIN_NOTEN_KAP7.filter((n) => n.stufe >= 6);
-  const runden = mischeZufallKap7(Array.of(
-    pool.at(0), pool.at(1), pool.at(2), pool.at(3), pool.at(4), pool.at(5),
-    pool.at(1), pool.at(3), pool.at(4), pool.at(5)
-  ));
-  let idx = 0;
-
-  const render = (hinweis = "Wie heisst diese Note im oberen Violinschlüssel?") => {
-    if (idx >= runden.length) {
-      abschliessenSpiel("kap7_2", 180, "Noten-Überflieger!", "Du liest h', c'', d'', e'', f'' und g'' bis ganz nach oben flüssig!");
-      return;
-    }
-    const ziel = runden.at(idx);
-    const buttonsHTML = Array.of("H", "C", "D", "E", "F", "G").map((t) => `
-      <button class="answer-btn" style="background:#fdf2f8; border-color:#db2777; color:#831843; font-size:22px;"
-              onclick="checkKap7Name('${t}')">${t}</button>`).join("");
-
-    document.getElementById("main-content").innerHTML = `
-      <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>7.2 Alle Noten von h' bis g''</span><span>${idx + 1} / ${runden.length}</span></div>
-        ${baueViolinSystemKap7SVG(Array.of({ stufe: ziel.stufe, farbe: "#db2777" }))}
-        <p class="quiz-hint">${hinweis}</p>
-        <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:14px;">${buttonsHTML}</div>
-      </div>`;
-  };
-
-  window.checkKap7Name = (wahl) => {
-    const ziel = runden.at(idx);
-    klavierAudio.spieleMidi(ziel.midi);
-    if (wahl === ziel.ton) {
-      idx++;
-      render(`Goldrichtig – ${ziel.label}! ✅`);
-    } else {
-      klavierAudio.spieleQuietsch();
-      render(`Tipp: ${ziel.merkspruch}`);
-    }
-  };
-  render();
-}
-// 7.3 Hohe Note auf dem Klavier finden – 10 Runden
-function starteKap7HoheNoteKlavier() {
-  const pool = VIOLIN_NOTEN_KAP7.filter((n) => n.stufe >= 6);
-  const runden = mischeZufallKap7(Array.of(
-    pool.at(0), pool.at(1), pool.at(2), pool.at(3), pool.at(4), pool.at(5),
-    pool.at(5), pool.at(3), pool.at(2), pool.at(1)
-  ));
-  let idx = 0;
-
-  const render = (hinweis = "Lies die hohe Note und tippe die richtige Taste in der zweigestrichenen Oktave an!") => {
-    if (idx >= runden.length) {
-      abschliessenSpiel("kap7_3", 200, "Oktav-Entdecker!", "Du findest auch die hohen Töne bis g'' sofort auf den Tasten!");
-      return;
-    }
-    const ziel = runden.at(idx);
-
-    document.getElementById("main-content").innerHTML = `
-      <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>7.3 Hohe Note auf dem Klavier</span><span>${idx + 1} / ${runden.length}</span></div>
-        ${baueViolinSystemKap7SVG(Array.of({ stufe: ziel.stufe, farbe: "#0284c7" }))}
-        <p class="quiz-hint">${hinweis}</p>
-        <div id="kap7-klaviatur-box" style="margin-top:10px;"></div>
-        <div style="font-size:12px; color:#64748b; margin-top:6px;">
-          Links leuchtet c' (Schloss-c') · in der Mitte leuchtet das zweigestrichene c''
+        <div class="answer-grid" style="grid-template-columns:1fr 1fr; margin-top:16px;">
+          <button class="answer-btn" style="background:#e0f2fe; border-color:#0284c7; color:#0c4a6e;" onclick="checkKap7_1(false)">☝️ Nur 1 Einzelton</button>
+          <button class="answer-btn" style="background:#ede9fe; border-color:#7c3aed; color:#4c1d95;" onclick="checkKap7_1(true)">🎹 Zusammenklang (mehrere Töne)</button>
         </div>
       </div>`;
+  };
 
-    zeigeKap7Klaviatur("kap7-klaviatur-box", (midi) => {
-      const aktZiel = runden.at(idx);
-      const tasteLabel = midiZuDeutschLabelKap7(midi);
-      const tonName = midiZuStammtonKap7(midi);
-      klavierAudio.spieleMidi(midi);
-
-      if (midi === aktZiel.midi) {
-        idx++;
-        render(`Volltreffer – ${aktZiel.label}! ✅`);
-      } else if (tonName === aktZiel.ton) {
-        klavierAudio.spieleQuietsch();
-        render(`Fast! Das war ${tasteLabel} – suche ${aktZiel.label} rechts beim leuchtenden c''!`);
-      } else {
-        klavierAudio.spieleQuietsch();
-        render(`Das war ${tasteLabel}. ${aktZiel.merkspruch}`);
-      }
-    });
+  window.replayKap7_1 = () => spieleKap7Klang(runden.at(idx).toene, runden.at(idx).mehrstimmig);
+  window.checkKap7_1 = (wahlMehr) => {
+    if (wahlMehr === runden.at(idx).mehrstimmig) {
+      idx++;
+      render("Super gehört! ✅", true);
+    } else {
+      klavierAudio.spieleQuietsch();
+      render("Hör nochmals hin: Klingt es ganz schlank (1 Ton) oder voll und breit (mehrere Töne)?", true);
+    }
   };
   render();
 }
 
-// 7.4 Melodien im grossen Tonraum (g' bis g'') – 4 Melodien
-function starteKap7MelodienTonraum() {
-  const lieder = Array.of(
-    {
-      titel: "🐦 Kuckuck, Kuckuck",
-      startTipp: "Starte hoch auf dem g'' (oben AUF der 5. Linie) und springe hinunter zum e''!",
-      noten: Array.of(
-        { stufe: 11, ton: "G", midi: 79, label: "g''" },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 11, ton: "G", midi: 79 },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 8, ton: "D", midi: 74 },
-        { stufe: 7, ton: "C", midi: 72 },
-        { stufe: 8, ton: "D", midi: 74 },
-        { stufe: 7, ton: "C", midi: 72 }
-      )
-    },
-    {
-      titel: "✨ Ode an die Freude (Obere Lage)",
-      startTipp: "Starte auf dem hohen e'' (4. Zwischenraum) und klettere bis zum g''!",
-      noten: Array.of(
-        { stufe: 9, ton: "E", midi: 76, label: "e''" },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 10, ton: "F", midi: 77 },
-        { stufe: 11, ton: "G", midi: 79 },
-        { stufe: 11, ton: "G", midi: 79 },
-        { stufe: 10, ton: "F", midi: 77 },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 8, ton: "D", midi: 74 },
-        { stufe: 7, ton: "C", midi: 72 }
-      )
-    },
-    {
-      titel: "🐝 Summ, summ, summ (Obere Lage)",
-      startTipp: "Starte ganz oben auf dem zweigestrichenen g'' (auf dem Dach)!",
-      noten: Array.of(
-        { stufe: 11, ton: "G", midi: 79, label: "g''" },
-        { stufe: 10, ton: "F", midi: 77 },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 8, ton: "D", midi: 74 },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 10, ton: "F", midi: 77 },
-        { stufe: 8, ton: "D", midi: 74 },
-        { stufe: 7, ton: "C", midi: 72 }
-      )
-    },
-    {
-      titel: "🔔 Glockengeläut (g' bis g'')",
-      startTipp: "Vom g' auf der 2. Linie hoch zum c'', e'' und bis aufs Dach g''!",
-      noten: Array.of(
-        { stufe: 4, ton: "G", midi: 67, label: "g'" },
-        { stufe: 7, ton: "C", midi: 72 },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 11, ton: "G", midi: 79 },
-        { stufe: 9, ton: "E", midi: 76 },
-        { stufe: 7, ton: "C", midi: 72 }
-      )
+// 7.2 Kleiner Schritt oder grosser Sprung? (10 Runden)
+function starteKap7SchrittOderSprung() {
+  const runden = mischeZufallKap7(Array.of(
+    { toene: Array.of(60, 62), typ: "schritt" },
+    { toene: Array.of(60, 72), typ: "sprung" },
+    { toene: Array.of(65, 64), typ: "schritt" },
+    { toene: Array.of(60, 67), typ: "sprung" },
+    { toene: Array.of(64, 65), typ: "schritt" },
+    { toene: Array.of(72, 60), typ: "sprung" },
+    { toene: Array.of(67, 69), typ: "schritt" },
+    { toene: Array.of(62, 71), typ: "sprung" },
+    { toene: Array.of(62, 60), typ: "schritt" },
+    { toene: Array.of(69, 60), typ: "sprung" }
+  ));
+  let idx = 0;
+
+  const render = (hinweis = "Liegen die zwei Töne direkt nebeneinander (Schritt) oder weit auseinander (Sprung)?", autoPlay = true) => {
+    if (idx >= runden.length) {
+      abschliessenSpiel("kap7_2", 160, "Abstands-Profi!", "Kleine Schritte und weite Sprünge hörst du jetzt sofort heraus!");
+      return;
     }
+    const akt = runden.at(idx);
+    if (autoPlay) spieleKap7Klang(akt.toene, false, 640);
+
+    document.getElementById("main-content").innerHTML = `
+      <div class="card" style="text-align:center;">
+        <div class="quiz-meta"><span>7.2 Kleiner Schritt oder grosser Sprung?</span><span>${idx + 1} / ${runden.length}</span></div>
+        <div style="margin:18px 0;">
+          <button class="answer-btn" style="background:#fef3c7; border-color:#f59e0b; color:#78350f; max-width:260px;"
+                  onclick="replayKap7_2()">🔊 Nochmals hören</button>
+        </div>
+        <p class="quiz-hint">${hinweis}</p>
+        <div class="answer-grid" style="grid-template-columns:1fr 1fr; margin-top:16px;">
+          <button class="answer-btn" style="background:#dcfce7; border-color:#16a34a; color:#14532d;" onclick="checkKap7_2('schritt')">👣 Kleiner Schritt</button>
+          <button class="answer-btn" style="background:#fef9c3; border-color:#eab308; color:#713f12;" onclick="checkKap7_2('sprung')">🦘 Grosser Sprung</button>
+        </div>
+      </div>`;
+  };
+
+  window.replayKap7_2 = () => spieleKap7Klang(runden.at(idx).toene, false, 640);
+  window.checkKap7_2 = (wahl) => {
+    if (wahl === runden.at(idx).typ) {
+      idx++;
+      render("Volltreffer! ✅", true);
+    } else {
+      klavierAudio.spieleQuietsch();
+      render("Tipp: Beim kleinen Schritt sind die Töne direkte Nachbarn!", true);
+    }
+  };
+  render();
+}
+// 7.3 Kuckuck oder Feuerwehrhorn? (10 Runden)
+function starteKap7KuckuckFeuerwehr() {
+  const runden = mischeZufallKap7(Array.of(
+    { toene: Array.of(67, 64), typ: "kuckuck" },
+    { toene: Array.of(60, 67), typ: "feuerwehr" },
+    { toene: Array.of(69, 65), typ: "kuckuck" },
+    { toene: Array.of(62, 69), typ: "feuerwehr" },
+    { toene: Array.of(64, 60), typ: "kuckuck" },
+    { toene: Array.of(65, 72), typ: "feuerwehr" },
+    { toene: Array.of(72, 69), typ: "kuckuck" },
+    { toene: Array.of(60, 67), typ: "feuerwehr" },
+    { toene: Array.of(67, 64), typ: "kuckuck" },
+    { toene: Array.of(64, 71), typ: "feuerwehr" }
+  ));
+  let idx = 0;
+
+  const render = (hinweis = "Ruft hier der Kuckuck (abwärts) oder das Feuerwehrhorn (aufwärts)?", autoPlay = true) => {
+    if (idx >= runden.length) {
+      abschliessenSpiel("kap7_3", 180, "Ruf-Experte!", "Kuckuck und Feuerwehrhorn erkennst du an jedem Klang!");
+      return;
+    }
+    const akt = runden.at(idx);
+    if (autoPlay) spieleKap7Klang(akt.toene, false, 580);
+
+    document.getElementById("main-content").innerHTML = `
+      <div class="card" style="text-align:center;">
+        <div class="quiz-meta"><span>7.3 Kuckuck oder Feuerwehrhorn?</span><span>${idx + 1} / ${runden.length}</span></div>
+        <div style="margin:18px 0;">
+          <button class="answer-btn" style="background:#fef3c7; border-color:#f59e0b; color:#78350f; max-width:260px;"
+                  onclick="replayKap7_3()">🔊 Nochmals hören</button>
+        </div>
+        <p class="quiz-hint">${hinweis}</p>
+        <div class="answer-grid" style="grid-template-columns:1fr 1fr; margin-top:16px;">
+          <button class="answer-btn" style="background:#dcfce7; border-color:#16a34a; color:#14532d;" onclick="checkKap7_3('kuckuck')">🐦 Kuckuck (Ku-ckuck!)</button>
+          <button class="answer-btn" style="background:#fee2e2; border-color:#ef4444; color:#7f1d1d;" onclick="checkKap7_3('feuerwehr')">🚒 Feuerwehrhorn (Ta-tü!)</button>
+        </div>
+      </div>`;
+  };
+
+  window.replayKap7_3 = () => spieleKap7Klang(runden.at(idx).toene, false, 580);
+  window.checkKap7_3 = (wahl) => {
+    if (wahl === runden.at(idx).typ) {
+      idx++;
+      render("Goldrichtig! ✅", true);
+    } else {
+      klavierAudio.spieleQuietsch();
+      render("Tipp: Der Kuckuck ruft nach unten, das Feuerwehrhorn ruft hoch hinauf!", true);
+    }
+  };
+  render();
+}
+
+// 7.4 Echo-Spiel: 2–3 Töne nachtippen (10 Runden)
+function starteKap7EchoSpiel() {
+  const tasten = Array.of(
+    { ton: "C", midi: 60 }, { ton: "D", midi: 62 },
+    { ton: "E", midi: 64 }, { ton: "F", midi: 65 }, { ton: "G", midi: 67 }
   );
+  const runden = Array.of(
+    Array.of("C", "D"),
+    Array.of("E", "D"),
+    Array.of("C", "E"),
+    Array.of("G", "E"),
+    Array.of("C", "D", "E"),
+    Array.of("E", "D", "C"),
+    Array.of("C", "E", "G"),
+    Array.of("G", "E", "C"),
+    Array.of("D", "E", "F"),
+    Array.of("G", "F", "E")
+  );
+  let idx = 0;
+  let eingabe = Array.of();
 
-  let liedIdx = 0;
-  let schritt = 0;
+  const spieleEcho = () => {
+    const folge = runden.at(idx).map((t) => tasten.find((x) => x.ton === t).midi);
+    spieleKap7Klang(folge, false, 600);
+  };
 
-  const render = (hinweis = "") => {
-    if (liedIdx >= lieder.length) {
-      abschliessenSpiel("kap7_4", 230, "Gipfel-Pianist!", "Du spielst Melodien sicher bis ganz nach oben zum zweigestrichenen g''!");
+  const render = (hinweis = "Höre gut zu und tippe die Melodie als Echo nach!", autoPlay = true) => {
+    if (idx >= runden.length) {
+      abschliessenSpiel("kap7_4", 200, "Echo-Champion!", "Du hast alle 10 Melodien nach dem Gehör nachgespielt!");
       return;
     }
-    const lied = lieder.at(liedIdx);
-    const text = hinweis || lied.startTipp;
+    const ziel = runden.at(idx);
+    if (autoPlay) spieleEcho();
 
-    const svgNoten = lied.noten.map((n, i) => ({
-      stufe: n.stufe,
-      farbe: i < schritt ? "#16a34a" : i === schritt ? "#db2777" : "#334155",
-      aktiv: i === schritt,
-      label: n.label || ""
-    }));
+    const punkteAnzeige = ziel.map((_, i) => (i < eingabe.length ? `✅ ${eingabe.at(i)}` : "⭕")).join("  ");
+    const btns = tasten.map((t) => `
+      <button onclick="checkKap7Echo('${t.ton}', ${t.midi})"
+              style="flex:1; height:120px; background:#fff; border:2px solid #0284c7; border-radius:0 0 12px 12px;
+                     display:flex; align-items:flex-end; justify-content:center; padding-bottom:12px;
+                     font-weight:800; font-size:20px; color:#0c4a6e; cursor:pointer;">${t.ton}</button>`).join("");
 
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>7.4 Melodien im grossen Tonraum</span><span>Lied ${liedIdx + 1} / ${lieder.length}</span></div>
-        <h2 style="margin-bottom:4px;">${lied.titel}</h2>
-        ${baueViolinSystemKap7SVG(svgNoten)}
-        <p class="quiz-hint">${text}</p>
-        <div id="kap7-lied-klaviatur" style="margin-top:10px;"></div>
-        <div style="font-size:12px; color:#64748b; margin-top:6px;">
-          Links leuchtet c' · in der Mitte leuchtet c''
+        <div class="quiz-meta"><span>7.4 Echo-Spiel (${ziel.length} Töne)</span><span>${idx + 1} / ${runden.length}</span></div>
+        <div style="margin:12px 0; display:flex; justify-content:center; gap:12px; align-items:center;">
+          <button class="answer-btn" style="background:#fef3c7; border-color:#f59e0b; color:#78350f; max-width:210px;"
+                  onclick="replayKap7Echo()">🔊 Melodie hören</button>
+          <span style="font-size:18px; font-weight:800;">${punkteAnzeige}</span>
         </div>
+        <p class="quiz-hint">${hinweis}</p>
+        <div style="display:flex; gap:6px; max-width:380px; margin:12px auto 0;">${btns}</div>
       </div>`;
+  };
 
-    zeigeKap7Klaviatur("kap7-lied-klaviatur", (midi) => {
-      const aktLied = lieder.at(liedIdx);
-      const ziel = aktLied.noten.at(schritt);
-      const tasteLabel = midiZuDeutschLabelKap7(midi);
-      const tonName = midiZuStammtonKap7(midi);
-
-      if (midi === ziel.midi) {
-        klavierAudio.spieleMidi(ziel.midi);
-        schritt++;
-        if (schritt >= aktLied.noten.length) {
-          liedIdx++;
-          schritt = 0;
-          render("Bravo! Wunderschön gespielt! 🎶 Auf zur nächsten Melodie!");
-        } else {
-          render("Super! Weiter zur nächsten Note 🎵");
-        }
+  window.replayKap7Echo = () => spieleEcho();
+  window.checkKap7Echo = (ton, midi) => {
+    klavierAudio.spieleMidi(midi, 0.6);
+    const ziel = runden.at(idx);
+    const erwartet = ziel.at(eingabe.length);
+    if (ton === erwartet) {
+      eingabe.push(ton);
+      if (eingabe.length >= ziel.length) {
+        idx++;
+        eingabe = Array.of();
+        setTimeout(() => render("Echo perfekt nachgespielt! ✅", true), 450);
       } else {
-        klavierAudio.spieleMidi(midi);
-        klavierAudio.spieleQuietsch();
-        if (tonName === ziel.ton) {
-          render(`Fast! ${tasteLabel} ist in der falschen Oktave – achte auf die leuchtenden c'- und c''-Tasten!`);
-        } else {
-          render(`Das war ${tasteLabel} – schau auf die pink leuchtende Note!`);
-        }
+        render(`Super (${ton})! Welcher Ton kommt als Nächstes?`, false);
       }
-    });
+    } else {
+      klavierAudio.spieleQuietsch();
+      eingabe = Array.of();
+      render(`Das war ${ton}. Hör dir das Echo nochmals von vorne an!`, true);
+    }
   };
   render();
 }
-// 7.5 Abschluss-Challenge (ID "kap7_6" wie in KAPITEL_DATEN) – 10 Fragen
-function starteKap7HoehenflugMeister() {
-  const fragen = mischeZufallKap7(Array.of(
-    { modus: "name", stufe: 7, ton: "C", label: "c''", midi: 72 },
-    { modus: "name", stufe: 11, ton: "G", label: "g''", midi: 79 },
-    { modus: "name", stufe: 9, ton: "E", label: "e''", midi: 76 },
-    { modus: "name", stufe: 6, ton: "H", label: "h'", midi: 71 },
-    { modus: "name", stufe: 10, ton: "F", label: "f''", midi: 77 },
-    { modus: "klavier", stufe: 7, ton: "C", label: "c''", midi: 72 },
-    { modus: "klavier", stufe: 11, ton: "G", label: "g''", midi: 79 },
-    { modus: "klavier", stufe: 8, ton: "D", label: "d''", midi: 74 },
-    { modus: "klavier", stufe: 10, ton: "F", label: "f''", midi: 77 },
-    { modus: "klavier", stufe: 9, ton: "E", label: "e''", midi: 76 }
+// 7.5 Boss-Challenge: Ohren-Profi (10 gemischte Runden)
+function starteKap7Boss() {
+  const aufgaben = mischeZufallKap7(Array.of(
+    { frage: "Einzelton oder Zusammenklang?", toene: Array.of(60, 64, 67), mehr: true, antwort: "mehr", opt: Array.of("ein|☝️ 1 Einzelton", "mehr|🎹 Zusammenklang") },
+    { frage: "Einzelton oder Zusammenklang?", toene: Array.of(64), mehr: false, antwort: "ein", opt: Array.of("ein|☝️ 1 Einzelton", "mehr|🎹 Zusammenklang") },
+    { frage: "Kleiner Schritt oder grosser Sprung?", toene: Array.of(62, 64), mehr: false, antwort: "schritt", opt: Array.of("schritt|👣 Schritt", "sprung|🦘 Sprung") },
+    { frage: "Kleiner Schritt oder grosser Sprung?", toene: Array.of(60, 72), mehr: false, antwort: "sprung", opt: Array.of("schritt|👣 Schritt", "sprung|🦘 Sprung") },
+    { frage: "Kuckuck oder Feuerwehrhorn?", toene: Array.of(67, 64), mehr: false, antwort: "kuckuck", opt: Array.of("kuckuck|🐦 Kuckuck", "feuerwehr|🚒 Feuerwehr") },
+    { frage: "Kuckuck oder Feuerwehrhorn?", toene: Array.of(60, 67), mehr: false, antwort: "feuerwehr", opt: Array.of("kuckuck|🐦 Kuckuck", "feuerwehr|🚒 Feuerwehr") },
+    { frage: "Einzelton oder Zusammenklang?", toene: Array.of(62, 65, 69), mehr: true, antwort: "mehr", opt: Array.of("ein|☝️ 1 Einzelton", "mehr|🎹 Zusammenklang") },
+    { frage: "Kleiner Schritt oder grosser Sprung?", toene: Array.of(67, 65), mehr: false, antwort: "schritt", opt: Array.of("schritt|👣 Schritt", "sprung|🦘 Sprung") },
+    { frage: "Kuckuck oder Feuerwehrhorn?", toene: Array.of(69, 65), mehr: false, antwort: "kuckuck", opt: Array.of("kuckuck|🐦 Kuckuck", "feuerwehr|🚒 Feuerwehr") },
+    { frage: "Kuckuck oder Feuerwehrhorn?", toene: Array.of(65, 72), mehr: false, antwort: "feuerwehr", opt: Array.of("kuckuck|🐦 Kuckuck", "feuerwehr|🚒 Feuerwehr") }
   ));
-
   let idx = 0;
-  let leben = 3;
 
-  const render = (hinweis = "") => {
-    if (leben <= 0) {
-      document.getElementById("main-content").innerHTML = `
-        <div class="card" style="text-align:center; padding:32px;">
-          <div style="font-size:52px;">💔</div>
-          <h2>Knapp am Höhenflug-Abzeichen vorbei!</h2>
-          <p class="quiz-hint" style="margin:10px 0 20px;">Alle 3 Herzen verbraucht – starte gleich den nächsten Flug!</p>
-          <button class="btn-primary" onclick="starteKap7HoehenflugMeister()">Challenge neu starten</button>
-        </div>`;
+  const render = (hinweis = "", autoPlay = true) => {
+    if (idx >= aufgaben.length) {
+      abschliessenSpiel("kap7_5", 240, "Ohren-Profi Boss! 🏆", "Du hast alle 10 Gehör-Prüfungen der Stufe 2 gemeistert!");
       return;
     }
-    if (idx >= fragen.length) {
-      abschliessenSpiel("kap7_6", 250, "Höhenflug-Meister! 🚀", "Du beherrschst den Violinschlüssel jetzt von c' bis ganz nach oben zum g''!");
-      return;
-    }
+    const akt = aufgaben.at(idx);
+    if (autoPlay) spieleKap7Klang(akt.toene, akt.mehr, 600);
 
-    const akt = fragen.at(idx);
-    const herzen = "❤️".repeat(leben) + "🤍".repeat(3 - leben);
+    const btns = akt.opt.map((entry) => {
+      const [val, label] = entry.split("|");
+      return `<button class="answer-btn" style="background:#e0f2fe; border-color:#0284c7; color:#0c4a6e;" onclick="checkKap7Boss('${val}')">${label}</button>`;
+    }).join("");
 
-    if (akt.modus === "name") {
-      const btns = Array.of("H", "C", "D", "E", "F", "G").map((t) => `
-        <button class="answer-btn" style="background:#fce7f3; border-color:#db2777; font-size:22px;"
-                onclick="checkKap7MeisterName('${t}')">${t}</button>`).join("");
-      document.getElementById("main-content").innerHTML = `
-        <div class="card" style="text-align:center;">
-          <div class="quiz-meta"><span>🚀 Challenge ${idx + 1} / ${fragen.length}</span><span>${herzen}</span></div>
-          ${baueViolinSystemKap7SVG(Array.of({ stufe: akt.stufe, farbe: "#db2777" }))}
-          <p class="quiz-hint">${hinweis || "Wie heisst diese hohe Note?"}</p>
-          <div class="answer-grid" style="grid-template-columns:repeat(3, 1fr); margin-top:14px;">${btns}</div>
-        </div>`;
-    } else {
-      document.getElementById("main-content").innerHTML = `
-        <div class="card" style="text-align:center;">
-          <div class="quiz-meta"><span>🚀 Challenge ${idx + 1} / ${fragen.length}</span><span>${herzen}</span></div>
-          ${baueViolinSystemKap7SVG(Array.of({ stufe: akt.stufe, farbe: "#0284c7" }))}
-          <p class="quiz-hint">${hinweis || "Tippe die richtige Taste in der zweigestrichenen Oktave an!"}</p>
-          <div id="kap7-meister-klaviatur" style="margin-top:10px;"></div>
-        </div>`;
-
-      zeigeKap7Klaviatur("kap7-meister-klaviatur", (midi) => {
-        const zielFrage = fragen.at(idx);
-        const tasteLabel = midiZuDeutschLabelKap7(midi);
-        klavierAudio.spieleMidi(midi);
-        if (midi === zielFrage.midi) {
-          idx++;
-          render("Volltreffer! ✅");
-        } else {
-          leben--;
-          klavierAudio.spieleQuietsch();
-          render(`Das war ${tasteLabel}! (-1 Herz)`);
-        }
-      });
-    }
+    document.getElementById("main-content").innerHTML = `
+      <div class="card" style="text-align:center;">
+        <div class="quiz-meta"><span>7.5 Boss-Challenge: Ohren-Profi</span><span>${idx + 1} / ${aufgaben.length}</span></div>
+        <div style="margin:18px 0;">
+          <button class="answer-btn" style="background:#fef3c7; border-color:#f59e0b; color:#78350f; max-width:260px;"
+                  onclick="replayKap7Boss()">🔊 Nochmals hören</button>
+        </div>
+        <p class="quiz-hint">${hinweis || akt.frage}</p>
+        <div class="answer-grid" style="grid-template-columns:1fr 1fr; margin-top:16px;">${btns}</div>
+      </div>`;
   };
 
-  window.checkKap7MeisterName = (wahl) => {
-    const akt = fragen.at(idx);
-    klavierAudio.spieleMidi(akt.midi);
-    if (wahl === akt.ton) {
+  window.replayKap7Boss = () => {
+    const akt = aufgaben.at(idx);
+    spieleKap7Klang(akt.toene, akt.mehr, 600);
+  };
+  window.checkKap7Boss = (wahl) => {
+    if (wahl === aufgaben.at(idx).antwort) {
       idx++;
-      render("Stark! ✅");
+      render("Boss-Punkt geholt! ✅", true);
     } else {
-      leben--;
       klavierAudio.spieleQuietsch();
-      render("Daneben! (-1 Herz)");
+      render("Hör dir den Klang nochmals in Ruhe an!", true);
     }
   };
-
   render();
 }
