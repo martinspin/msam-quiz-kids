@@ -359,7 +359,7 @@ function starteKap5SongTrackLangeNoten() {
         bpm: 76,
         mp3: "sounds/dancepop_76bpm.mp3",
         vorlauf: 4,
-        offsetMs: 2200,
+        offsetMs: 3158,
         hatIntro: true,
         seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" })
       },
