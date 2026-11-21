@@ -77,19 +77,19 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap5_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap5Spiel(5)" }
     )
   },
-  {
+    {
     id: 6,
     stufe: 1,
-    titel: "6. Erste Lieder lesen",
-    icon: "🎵",
-    farbe: "#9333ea",
-    beschreibung: "Spiele echte Kinderlieder direkt vom Notenblatt auf dem Klavier!",
+    titel: "6. Violinschlüssel & Notennamen",
+    icon: "🎼",
+    farbe: "#7c3aed",
+    beschreibung: "Die 3 Anker-Töne C–E–G, Noten von C bis A lesen und erste Lieder spielen!",
     spiele: Array.of(
-      { id: "kap6_1", titel: "6.1 Alle meine Entchen", punkte: 140, startFn: "starteKap6Spiel(1)" },
-      { id: "kap6_2", titel: "6.2 Hänschen klein", punkte: 140, startFn: "starteKap6Spiel(2)" },
-      { id: "kap6_3", titel: "6.3 Summ, summ, summ", punkte: 150, startFn: "starteKap6Spiel(3)" },
-      { id: "kap6_4", titel: "6.4 Lieder-Quiz", punkte: 160, startFn: "starteKap6Spiel(4)" },
-      { id: "kap6_5", titel: "6.5 Konzert-Pianist", punkte: 200, startFn: "starteKap6Spiel(5)" }
+      { id: "kap6_1", titel: "6.1 Die 3 Anker-Töne (C – E – G)", punkte: 150, startFn: "starteKap6Spiel(1)" },
+      { id: "kap6_2", titel: "6.2 Notennamen lesen (C bis A)", punkte: 170, startFn: "starteKap6Spiel(2)" },
+      { id: "kap6_3", titel: "6.3 Note auf dem Klavier finden", punkte: 190, startFn: "starteKap6Spiel(3)" },
+      { id: "kap6_4", titel: "6.4 Kinderlieder nach Noten spielen", punkte: 230, startFn: "starteKap6Spiel(4)" },
+      { id: "kap6_5", titel: "6.5 Violinschlüssel-Meister", punkte: 280, startFn: "starteKap6Spiel(5)" }
     )
   },
 
