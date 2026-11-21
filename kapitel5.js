@@ -363,6 +363,22 @@ function starteKap5SongTrackEngine(cfg) {
   };
   renderUI();
 }
+// 5.3 Viertel & Pause (da & sch)
+function starteKap5SongTrackViertel() {
+  starteKap5SongTrackEngine({
+    svgId: "kap5-svg-3", msgId: "kap5-msg-3", padId: "kap5-pad-3", tapFnName: "tapKap5Viertel",
+    zoneFill: "#fef3c7", zoneStroke: "#f59e0b", btnBorder: "#16a34a", btnBg: "linear-gradient(135deg,#22c55e,#15803d)", btnShadow: "#14532d",
+    btnLabel: "🎹 DRÜCKEN & HALTEN!",
+    songs: Array.of(
+      { titel: "5.3 Song 1: Gemütlicher Start", takt: 4, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }) },
+      { titel: "5.3 Song 2: Erste Pause", takt: 4, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
+      { titel: "5.3 Song 3: Walzer-Schritt", takt: 3, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
+      { titel: "5.3 Song 4: Echo-Hüpfer", takt: 4, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
+      { titel: "5.3 Song 5: Viertel-Finale", takt: 3, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }) }
+    ),
+    onFertig: () => abschliessenSpiel("kap5_3", 140, "5-Song-Champion! 🥁", "Alle 5 Songs im 3/4- und 4/4-Takt gemeistert!")
+  });
+}
 
 // 5.4 Lange Noten (bon-bon, kau-gum-mi, gum-mi-bärch-en)
 function starteKap5SongTrackLangeNoten() {
