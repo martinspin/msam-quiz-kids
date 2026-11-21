@@ -116,9 +116,9 @@ const KAPITEL_DATEN = Array.of(
     farbe: "#2563eb",
     beschreibung: "Tiefe Töne entdecken: Lerne den Bassschlüssel von c bis c' für die linke Hand!",
     spiele: Array.of(
-      { id: "kap8_1", titel: "8.1 Anker-Töne im Bass (c – f – g)", punkte: 160, startFn: "starteKap8Spiel(1)" },
-      { id: "kap8_2", titel: "8.2 Fünf-Finger-Raum (c bis g)", punkte: 180, startFn: "starteKap8Spiel(2)" },
-      { id: "kap8_3", titel: "8.3 Bass-Note auf dem Klavier", punkte: 200, startFn: "starteKap8Spiel(3)" },
+      { id: "kap8_1", titel: "8.1 Anker-Töne im Bass (f – a – c')", punkte: 160, startFn: "starteKap8Spiel(1)" },
+      { id: "kap8_2", titel: "8.2 Notennamen lesen (f bis c')", punkte: 180, startFn: "starteKap8Spiel(2)" },
+      { id: "kap8_3", titel: "8.3 Bass-Note auf dem Klavier (ganze Oktave c bis c')", punkte: 200, startFn: "starteKap8Spiel(3)" },
       { id: "kap8_4", titel: "8.4 Kleine Bass-Melodien", punkte: 230, startFn: "starteKap8Spiel(4)" },
       { id: "kap8_6", titel: "8.5 Bassschlüssel-Profi", punkte: 250, startFn: "starteKap8Spiel(5)" }
     )
