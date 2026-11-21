@@ -46,23 +46,37 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap2_6", titel: "3.5 Klaviertasten-Meister", punkte: 250, startFn: "starteKap2Spiel(6)" }
     )
   },
+{
+    id: 4,
+    stufe: 1,
+    titel: "4. Noten lesen lernen",
+    icon: "🎼",
+    farbe: "#4f46e5",
+    beschreibung: "Linien, Zwischenräume, Schritte & Sprünge im Notensystem!",
+    spiele: Array.of(
+      { id: "kap4_1", titel: "4.1 Linie oder Zwischenraum?", punkte: 120, startFn: "starteKap4Spiel(1)" },
+      { id: "kap4_2", titel: "4.2 Höher, tiefer oder gleich?", punkte: 140, startFn: "starteKap4Spiel(2)" },
+      { id: "kap4_3", titel: "4.3 Schritte & Sprünge", punkte: 150, startFn: "starteKap4Spiel(3)" },
+      { id: "kap4_4", titel: "4.4 Melodie-Verlauf lesen", punkte: 180, startFn: "starteKap4Spiel(4)" },
+      { id: "kap4_5", titel: "4.5 Noten-Detektiv Boss", punkte: 250, startFn: "starteKap4Spiel(5)" }
+    )
+  },
+  
     {
     id: 5,
     stufe: 1,
     titel: "5. Rhythmus & Notenwerte",
     icon: "🥁",
-    farbe: "#d97706",
-    beschreibung: "Da, Bon-bon, Kau-gum-mi & Gum-mi-bär-chen – fühle jeden Takt!",
+    farbe: "#ea580c",
+    beschreibung: "Viertel, Halbe und Ganze Noten: Klatsche und zähle den Takt wie ein Profi!",
     spiele: Array.of(
-      { id: "kap5_1", titel: "5.1 Rhythmus-Wörter & Noten", punkte: 120, startFn: "starteKap5Spiel(1)" },
-      { id: "kap5_2", titel: "5.2 Tonlängen hören", punkte: 140, startFn: "starteKap5Spiel(2)" },
-      { id: "kap5_3", titel: "5.3 Vom Wort zum Zählen", punkte: 150, startFn: "starteKap5Spiel(3)" },
-      { id: "kap5_4", titel: "5.4 Aushalte-Pad", punkte: 180, startFn: "starteKap5Spiel(4)" },
-      { id: "kap5_6", titel: "5.5 Rhythmus-Meister", punkte: 250, startFn: "starteKap5Spiel(6)" }
+      { id: "kap5_1", titel: "5.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap5Spiel(1)" },
+      { id: "kap5_2", titel: "5.2 Schläge zählen", punkte: 130, startFn: "starteKap5Spiel(2)" },
+      { id: "kap5_3", titel: "5.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap5Spiel(3)" },
+      { id: "kap5_4", titel: "5.4 Takt-Baumeister", punkte: 160, startFn: "starteKap5Spiel(4)" },
+      { id: "kap5_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap5Spiel(5)" }
     )
   },
-
-
   {
     id: 6,
     stufe: 1,
