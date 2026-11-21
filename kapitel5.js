@@ -134,11 +134,18 @@ function starteKap5Zaehlen() {
   };
   render();
 }
-// Gemeinsame Song-Track-Engine mit taktgenauem Einzählen (3/4 = 3 Schläge, 4/4 = 4 Schläge)
+// Gemeinsame Song-Track-Engine mit echtem GEDRÜCKT-HALTEN (Press & Hold) & taktgenauem Einzählen
 function starteKap5SongTrackEngine(cfg) {
   let songIdx = 0, animId = null, aktiv = false, startZeit = 0, notenListe = Array.of();
+  let gedrueckt = false, aktiveNote = null;
   const beatMs = cfg.beatMs || 880, pxProBeat = 95, zielX = 85;
-  const stopSong = () => { aktiv = false; if (animId) cancelAnimationFrame(animId); };
+
+  const stopTon = () => {
+    gedrueckt = false;
+    aktiveNote = null;
+    if (typeof klavierAudio !== "undefined" && klavierAudio.stopAlle) klavierAudio.stopAlle();
+  };
+  const stopSong = () => { aktiv = false; stopTon(); if (animId) cancelAnimationFrame(animId); };
 
   const starteSong = () => {
     stopSong();
@@ -146,23 +153,54 @@ function starteKap5SongTrackEngine(cfg) {
     const vorlauf = song.takt;
     let beat = vorlauf;
     notenListe = song.seq.map((n, i) => {
-      const o = { id: i, t: n.t, d: n.d, w: n.w, beat, status: "offen" };
+      const o = { id: i, t: n.t, d: n.d, w: n.w, beat, status: "offen", gehalten: 0 };
       beat += n.d;
       return o;
     });
     const gesamtBeats = beat + 1;
-    const melodie = Array.of(60, 64, 67, 64, 65, 69, 67, 62, 64, 67, 72, 67);
+       // Echter Pop-Groove (C -> G -> a -> F im 4/4-Takt, Walzer-Groove im 3/4-Takt)
+    const akkorde4 = Array.of(
+      Array.of(48, 60, 64, 67), // C-Dur
+      Array.of(43, 59, 62, 67), // G-Dur
+      Array.of(45, 60, 64, 69), // a-Moll
+      Array.of(41, 60, 65, 69)  // F-Dur
+    );
+    const melodie4 = Array.of(72, 71, 69, 67, 69, 71, 72, 74, 72, 69, 67, 64, 65, 67, 69, 72);
+    const melodie3 = Array.of(72, 67, 64, 71, 67, 62, 69, 64, 60, 72, 71, 67);
 
     for (let b = 0; b < gesamtBeats; b++) {
       setTimeout(() => {
         if (!aktiv || !document.getElementById(cfg.svgId)) return;
         const vor = b < vorlauf;
-        klavierAudio.spieleMidi(vor ? (b === 0 ? 79 : 74) : melodie.at((b - vorlauf) % melodie.length), 0.35, vor ? 0.35 : 0.45);
+        if (vor) {
+          // Trockener Drumstick-Klick beim Einzählen
+          klavierAudio.spieleMidi(b === 0 ? 84 : 79, 0.12, 0.35);
+        } else {
+          const songBeat = b - vorlauf;
+          const taktNr = Math.floor(songBeat / song.takt);
+          const schlagImTakt = songBeat % song.takt;
+          const akkord = akkorde4.at(taktNr % akkorde4.length);
+
+          if (song.takt === 3) {
+            // Beschwingter Walzer: Schlag 1 tiefer Bass, Schlag 2 & 3 sanfter Akkord
+            if (schlagImTakt === 0) klavierAudio.spieleMidi(akkord.at(0), 0.7, 0.42);
+            else akkord.slice(1).forEach((t) => klavierAudio.spieleMidi(t, 0.35, 0.25));
+            klavierAudio.spieleMidi(melodie3.at(songBeat % melodie3.length), 0.45, 0.32);
+          } else {
+            // Moderner Pop-Groove: Voller warmer Akkord auf 1 & 3 + Melodie
+            if (schlagImTakt === 0 || schlagImTakt === 2) {
+              akkord.forEach((t) => klavierAudio.spieleMidi(t, 0.75, schlagImTakt === 0 ? 0.36 : 0.24));
+            } else {
+              klavierAudio.spieleMidi(akkord.at(0) + 12, 0.3, 0.22);
+            }
+            klavierAudio.spieleMidi(melodie4.at(songBeat % melodie4.length), 0.45, 0.32);
+          }
+        }
         const msgEl = document.getElementById(cfg.msgId);
-        if (msgEl) {
+        if (msgEl && !gedrueckt) {
           msgEl.textContent = vor
-            ? `🎵 Einzählen (${song.takt}/4-Takt – ${vorlauf} Schläge): ${b + 1} ...`
-            : "🔥 Jetzt im Takt tippen!";
+            ? `🥁 Einzählen (${song.takt}/4-Takt – ${vorlauf} Schläge): ${b + 1} ...`
+            : "🔥 Antippen & bei langen Noten GEDRÜCKT HALTEN!";
         }
       }, b * beatMs);
     }
@@ -173,21 +211,66 @@ function starteKap5SongTrackEngine(cfg) {
     const loop = (jetzt) => {
       if (!aktiv || !document.getElementById(cfg.svgId)) return;
       const aktBeat = (jetzt - startZeit) / beatMs;
+      const msgEl = document.getElementById(cfg.msgId);
+
+      // Prüfen, ob während einer Pause gedrückt gehalten wird
+      if (gedrueckt) {
+        const pauseJetzt = notenListe.find((n) => n.t === "vp" && aktBeat >= n.beat + 0.12 && aktBeat <= n.beat + n.d - 0.12);
+        if (pauseJetzt && pauseJetzt.status !== "verpasst") {
+          pauseJetzt.status = "verpasst";
+          klavierAudio.spieleQuietsch();
+          if (msgEl) msgEl.textContent = "🤫 Bei «sch» den Finger wegnehmen!";
+        }
+      }
+
+      // Aktive gehaltene Note füllen
+      if (gedrueckt && aktiveNote && aktiveNote.status === "halten") {
+        aktiveNote.gehalten = Math.max(0, Math.min(aktiveNote.d, aktBeat - aktiveNote.beat));
+        if (aktiveNote.gehalten >= aktiveNote.d - 0.32) {
+          aktiveNote.status = "ok";
+          if (msgEl) msgEl.textContent = `🔥 SUPER GEHALTEN! (${aktiveNote.w})`;
+        }
+      }
+
       let svg = `<line x1="20" y1="68" x2="540" y2="68" stroke="#cbd5e1" stroke-width="3"/>`;
-      svg += `<rect x="${zielX - 28}" y="16" width="56" height="104" rx="14" fill="${cfg.zoneFill}" stroke="${cfg.zoneStroke}" stroke-width="3.2"/>`;
+      svg += `<rect x="${zielX - 28}" y="16" width="56" height="104" rx="14" fill="${gedrueckt ? "#bbf7d0" : cfg.zoneFill}" stroke="${cfg.zoneStroke}" stroke-width="3.2"/>`;
 
       notenListe.forEach((n) => {
         const x = zielX + (n.beat - aktBeat) * pxProBeat;
-        if (n.status === "offen" && aktBeat - n.beat > 0.58) n.status = n.t === "vp" ? "ok" : "verpasst";
-        if (x < -40 || x > 580) return;
-        const f = n.status === "ok" ? "#16a34a" : n.status === "verpasst" ? "#ef4444" : "#1e293b";
+        const balkenBreite = Math.max(0, n.d * pxProBeat - 22);
+
+        if (n.status === "offen" && aktBeat - n.beat > 0.58) {
+          n.status = n.t === "vp" ? "ok" : "verpasst";
+        }
+        if (n.status === "halten" && !gedrueckt) {
+          n.status = n.gehalten >= n.d - 0.35 ? "ok" : "verpasst";
+          if (n.status === "verpasst" && msgEl) msgEl.textContent = `✋ «${n.w}» noch länger gedrückt halten!`;
+        }
+        if (n.status === "halten" && aktBeat > n.beat + n.d + 0.25) {
+          n.status = "ok";
+        }
+
+        if (x + balkenBreite < -40 || x > 580) return;
+        const f = n.status === "ok" ? "#16a34a" : n.status === "verpasst" ? "#ef4444" : n.status === "halten" ? "#0284c7" : "#1e293b";
+
+        // Halte-Schweif für alle klingenden Noten (besonders sichtbar bei bon-bon, kau-gum-mi, gum-mi-bärch-en)
+        if (n.t !== "vp" && n.d > 1) {
+          const fuellBreite = Math.min(balkenBreite, (n.gehalten / n.d) * balkenBreite);
+          svg += `<rect x="${x + 12}" y="58" width="${balkenBreite}" height="20" rx="10" fill="#e2e8f0" stroke="${f}" stroke-width="2"/>`;
+          if (fuellBreite > 2) {
+            svg += `<rect x="${x + 12}" y="58" width="${fuellBreite}" height="20" rx="10" fill="#22c55e"/>`;
+          }
+        }
+
         if (n.t === "v") svg += `<ellipse cx="${x}" cy="68" rx="11" ry="8" transform="rotate(-15 ${x} 68)" fill="${f}"/><line x1="${x + 9}" y1="68" x2="${x + 9}" y2="24" stroke="${f}" stroke-width="3"/>`;
         else if (n.t === "h" || n.t === "ph") {
           svg += `<ellipse cx="${x}" cy="68" rx="11" ry="8" transform="rotate(-15 ${x} 68)" fill="#fff" stroke="${f}" stroke-width="3"/><line x1="${x + 9}" y1="68" x2="${x + 9}" y2="24" stroke="${f}" stroke-width="3"/>`;
           if (n.t === "ph") svg += `<circle cx="${x + 19}" cy="66" r="4" fill="${f}"/>`;
         } else if (n.t === "g") svg += `<ellipse cx="${x}" cy="68" rx="13" ry="8.5" fill="#fff" stroke="${f}" stroke-width="3.2"/>`;
-        else svg += `<path d="M ${x - 4} 46 L ${x + 6} 58 L ${x - 4} 68 L ${x + 5} 79" fill="none" stroke="#64748b" stroke-width="3.2" stroke-linecap="round"/>`;
-        svg += `<text x="${x + 5}" y="114" font-size="13" font-weight="800" fill="${f}" text-anchor="middle">${n.w}</text>`;
+        else svg += `<path d="M ${x - 4} 46 L ${x + 6} 58 L ${x - 4} 68 L ${x + 5} 79" fill="none" stroke="${f}" stroke-width="3.2" stroke-linecap="round"/>`;
+
+        const textX = n.t !== "vp" && n.d > 1 ? x + 12 + balkenBreite / 2 : x + 5;
+        svg += `<text x="${textX}" y="114" font-size="13" font-weight="800" fill="${f}" text-anchor="middle">${n.w}</text>`;
       });
 
       const el = document.getElementById(cfg.svgId);
@@ -199,12 +282,13 @@ function starteKap5SongTrackEngine(cfg) {
           songIdx++;
           if (songIdx >= cfg.songs.length) {
             window.onkeydown = null;
+            window.onkeyup = null;
             cfg.onFertig();
           } else {
             renderUI(`Super! Song ${songIdx}/${cfg.songs.length} geschafft – nächster Song startet! ✅`);
           }
         } else {
-          renderUI("Fast! Probieren wir diesen Song gleich nochmals.");
+          renderUI("Fast! Halte die langen Balken ganz bis zum Ende gedrückt.");
         }
         return;
       }
@@ -217,42 +301,67 @@ function starteKap5SongTrackEngine(cfg) {
     const song = cfg.songs.at(songIdx);
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>${song.titel}</span><span>${song.takt}/4-Takt (${song.takt} Schläge einzählen) | ${songIdx + 1}/${cfg.songs.length}</span></div>
+        <div class="quiz-meta"><span>${song.titel}</span><span>${song.takt}/4-Takt (${song.takt} Schläge) | ${songIdx + 1}/${cfg.songs.length}</span></div>
         <svg id="${cfg.svgId}" viewBox="0 0 560 132" style="width:100%; max-width:520px; height:auto; background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; display:block; margin:8px auto;"></svg>
         <p id="${cfg.msgId}" class="quiz-hint" style="font-weight:700;">${msg || `🎵 Einzählen (${song.takt}/4-Takt – ${song.takt} Schläge): 1 ...`}</p>
-        <button id="${cfg.padId}" onpointerdown="${cfg.tapFnName}()" style="width:100%; max-width:350px; height:120px; margin-top:8px; border-radius:22px; border:3px solid ${cfg.btnBorder}; background:${cfg.btnBg}; color:#fff; font-size:25px; font-weight:900; box-shadow:0 6px 0 ${cfg.btnShadow}; cursor:pointer; touch-action:manipulation;">${cfg.btnLabel}</button>
+        <button id="${cfg.padId}"
+          onpointerdown="${cfg.tapFnName}Down()"
+          onpointerup="${cfg.tapFnName}Up()"
+          onpointerleave="${cfg.tapFnName}Up()"
+          onpointercancel="${cfg.tapFnName}Up()"
+          style="width:100%; max-width:350px; height:120px; margin-top:8px; border-radius:22px; border:3px solid ${cfg.btnBorder}; background:${cfg.btnBg}; color:#fff; font-size:23px; font-weight:900; box-shadow:0 6px 0 ${cfg.btnShadow}; cursor:pointer; touch-action:none; user-select:none;">
+          🎹 DRÜCKEN & HALTEN!
+        </button>
       </div>`;
     setTimeout(starteSong, 350);
   };
 
-  window[cfg.tapFnName] = () => {
-    klavierAudio.spieleMidi(72, 0.3, 1.0);
+  window[cfg.tapFnName + "Down"] = () => {
+    if (gedrueckt) return;
+    gedrueckt = true;
+    const pad = document.getElementById(cfg.padId);
+    if (pad) pad.style.transform = "translateY(4px)";
+    klavierAudio.spieleMidi(72, 3.6, 1.0);
     if (!aktiv) return;
     const aktBeat = (performance.now() - startZeit) / beatMs;
     const k = notenListe.find((n) => n.status === "offen" && Math.abs(aktBeat - n.beat) <= 0.58);
     const msgEl = document.getElementById(cfg.msgId);
     if (!k) return;
-    if (k.t === "vp") { k.status = "verpasst"; klavierAudio.spieleQuietsch(); if (msgEl) msgEl.textContent = "🤫 Bei «sch» ist Pause!"; }
-    else { k.status = "ok"; if (msgEl) msgEl.textContent = "🔥 PERFEKT!"; }
+    if (k.t === "vp") {
+      k.status = "verpasst";
+      klavierAudio.spieleQuietsch();
+      if (msgEl) msgEl.textContent = "🤫 Bei «sch» ist Pause – nicht drücken!";
+    } else if (k.d === 1) {
+      k.status = "ok";
+      aktiveNote = k;
+      if (msgEl) msgEl.textContent = "🔥 PERFEKT! (da)";
+    } else {
+      k.status = "halten";
+      aktiveNote = k;
+      if (msgEl) msgEl.textContent = `✋ Halten für «${k.w}» (${k.d} Schläge)...`;
+    }
   };
-  window.onkeydown = (e) => { if (e.code === "Space" && document.getElementById(cfg.padId)) { e.preventDefault(); window[cfg.tapFnName](); } };
+
+  window[cfg.tapFnName + "Up"] = () => {
+    if (!gedrueckt) return;
+    const pad = document.getElementById(cfg.padId);
+    if (pad) pad.style.transform = "translateY(0)";
+    stopTon();
+  };
+
+  window.onkeydown = (e) => {
+    if (e.code === "Space" && document.getElementById(cfg.padId)) {
+      e.preventDefault();
+      if (!e.repeat) window[cfg.tapFnName + "Down"]();
+    }
+  };
+  window.onkeyup = (e) => {
+    if (e.code === "Space" && document.getElementById(cfg.padId)) {
+      e.preventDefault();
+      window[cfg.tapFnName + "Up"]();
+    }
+  };
   renderUI();
-}
-// 5.3 Viertel & Pause (da & sch)
-function starteKap5SongTrackViertel() {
-  starteKap5SongTrackEngine({
-    svgId: "kap5-svg-3", msgId: "kap5-msg-3", padId: "kap5-pad-3", tapFnName: "tapKap5Viertel",
-    zoneFill: "#fef3c7", zoneStroke: "#f59e0b", btnBorder: "#16a34a", btnBg: "linear-gradient(135deg,#22c55e,#15803d)", btnShadow: "#14532d",
-    btnLabel: "🥁 TAP! (oder Leertaste)",
-    songs: Array.of(
-      { titel: "5.3 Song 1: Gemütlicher Start", takt: 4, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }) },
-      { titel: "5.3 Song 2: Erste Pause", takt: 4, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
-      { titel: "5.3 Song 3: Walzer-Schritt", takt: 3, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
-      { titel: "5.3 Song 4: Echo-Hüpfer", takt: 4, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
-      { titel: "5.3 Song 5: Viertel-Finale", takt: 3, seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }) }
-    ),
-    onFertig: () => abschliessenSpiel("kap5_3", 140, "5-Song-Champion! 🥁", "Alle 5 Songs im 3/4- und 4/4-Takt gemeistert!")
-  });
 }
 
 // 5.4 Lange Noten (bon-bon, kau-gum-mi, gum-mi-bärch-en)
