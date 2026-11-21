@@ -125,7 +125,7 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap8_4", titel: "8.4 Kleine Bass-Melodien", punkte: 230, startFn: "starteKap8Spiel(4)" },
       { id: "kap8_6", titel: "8.5 Bassschlüssel-Profi", punkte: 250, startFn: "starteKap8Spiel(5)" }
     )
-  }
+  },
     {
     id: 9,
     stufe: 2,
@@ -156,7 +156,6 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap10_5", titel: "10.5 Boss-Challenge: Dynamik-Dirigent", punkte: 230, startFn: "starteKap10Spiel(5)" }
     )
   },
-
 );
 
 // 2/3 APP.JS: Fortschritts-Speicher & Startseite (mit Auto-Schliessen erledigter Stufen)
