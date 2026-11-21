@@ -264,20 +264,23 @@ function starteKap5Spiel(nummer) {
   if (nummer === 5 || nummer === 6) starteKap5Boss();
 }
 
-// 5.3 Duolingo-Song-Track: Viertel & Pause (da & sch)
+// 5.3 Duolingo-Song-Track: 5 entspannte Songs mit Vierteln (da) & Pausen (sch)
 function starteKap5SongTrackViertel() {
   const songs = Array.of(
-    { titel: "5.3 Da-Da-Start (4/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }) },
-    { titel: "5.3 Pausen-Hüpfer (3/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) }
+    { titel: "Song 1/5: Gemütlicher Start (4/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }) },
+    { titel: "Song 2/5: Erste Pause (4/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
+    { titel: "Song 3/5: Walzer-Schritt (3/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
+    { titel: "Song 4/5: Echo-Hüpfer (4/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }) },
+    { titel: "Song 5/5: Finale (4/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }) }
   );
 
-  let songIdx = 0, animId = null, aktiv = false, startZeit = 0, notenListe = Array.of(), punkte = 0;
-  const zielPunkte = 10, beatMs = 660, pxProBeat = 105, zielX = 85;
+  let songIdx = 0, animId = null, aktiv = false, startZeit = 0, notenListe = Array.of();
+  const beatMs = 880, pxProBeat = 95, zielX = 85;
   const stopSong = () => { aktiv = false; if (animId) cancelAnimationFrame(animId); };
 
   const starteSong = () => {
     stopSong();
-    const song = songs.at(songIdx % songs.length);
+    const song = songs.at(songIdx);
     let beat = 3;
     notenListe = song.seq.map((n, i) => { const o = { id: i, t: n.t, d: n.d, w: n.w, beat, status: "offen" }; beat += n.d; return o; });
     const gesamtBeats = beat + 1;
@@ -295,11 +298,11 @@ function starteKap5SongTrackViertel() {
     const loop = (jetzt) => {
       if (!aktiv || !document.getElementById("kap5-track-svg-3")) return;
       const aktBeat = (jetzt - startZeit) / beatMs;
-      let svg = `<line x1="20" y1="68" x2="540" y2="68" stroke="#cbd5e1" stroke-width="3"/><rect x="${zielX - 24}" y="16" width="48" height="104" rx="14" fill="#fef3c7" stroke="#f59e0b" stroke-width="3"/>`;
+      let svg = `<line x1="20" y1="68" x2="540" y2="68" stroke="#cbd5e1" stroke-width="3"/><rect x="${zielX - 28}" y="16" width="56" height="104" rx="14" fill="#fef3c7" stroke="#f59e0b" stroke-width="3"/>`;
 
       notenListe.forEach((n) => {
         const x = zielX + (n.beat - aktBeat) * pxProBeat;
-        if (n.status === "offen" && aktBeat - n.beat > 0.48) n.status = n.t === "vp" ? "ok" : "verpasst";
+        if (n.status === "offen" && aktBeat - n.beat > 0.58) n.status = n.t === "vp" ? "ok" : "verpasst";
         if (x < -40 || x > 580) return;
         const f = n.status === "ok" ? "#16a34a" : n.status === "verpasst" ? "#ef4444" : "#1e293b";
         if (n.t === "v") svg += `<ellipse cx="${x}" cy="68" rx="11" ry="8" transform="rotate(-15 ${x} 68)" fill="${f}"/><line x1="${x + 9}" y1="68" x2="${x + 9}" y2="24" stroke="${f}" stroke-width="3"/>`;
@@ -311,8 +314,18 @@ function starteKap5SongTrackViertel() {
       if (el) el.innerHTML = svg;
       if (aktBeat >= gesamtBeats) {
         stopSong();
-        if (punkte >= zielPunkte) { window.onkeydown = null; abschliessenSpiel("kap5_3", 140, "Viertel-Track-Star! 🥁", "Du hast alle da-Noten im Song-Fluss gefangen!"); }
-        else { songIdx++; renderUI(`Noch ${zielPunkte - punkte} Treffer bis zum Ziel!`); }
+        const verpasst = notenListe.filter((n) => n.status === "verpasst").length;
+        if (verpasst <= 1) {
+          songIdx++;
+          if (songIdx >= songs.length) {
+            window.onkeydown = null;
+            abschliessenSpiel("kap5_3", 140, "5-Song-Champion! 🥁", "Du hast alle 5 Songs mit Vierteln und Pausen gemeistert!");
+          } else {
+            renderUI(`Super! Song ${songIdx}/5 geschafft – auf zum nächsten! ✅`);
+          }
+        } else {
+          renderUI("Fast! Probieren wir diesen Song gleich nochmals gemütlich.");
+        }
         return;
       }
       animId = requestAnimationFrame(loop);
@@ -321,44 +334,47 @@ function starteKap5SongTrackViertel() {
   };
 
   const renderUI = (msg = "") => {
-    const song = songs.at(songIdx % songs.length);
+    const song = songs.at(songIdx);
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>${song.titel}</span><span>⭐ ${punkte} / ${zielPunkte} Treffer</span></div>
+        <div class="quiz-meta"><span>${song.titel}</span><span>Song ${songIdx + 1} / ${songs.length}</span></div>
         <svg id="kap5-track-svg-3" viewBox="0 0 560 132" style="width:100%; max-width:520px; height:auto; background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; display:block; margin:8px auto;"></svg>
-        <p id="kap5-msg-3" class="quiz-hint" style="font-weight:700;">${msg || "Tippe im gelben Feld auf «da» – bei «sch» nicht tippen!"}</p>
+        <p id="kap5-msg-3" class="quiz-hint" style="font-weight:700;">${msg || "Tippe ganz entspannt im gelben Feld auf «da» – bei «sch» nicht tippen!"}</p>
         <button id="kap5-pad-3" onpointerdown="trefferKap5Track3()" style="width:100%; max-width:350px; height:120px; margin-top:8px; border-radius:22px; border:3px solid #16a34a; background:linear-gradient(135deg,#22c55e,#15803d); color:#fff; font-size:25px; font-weight:900; box-shadow:0 6px 0 #14532d; cursor:pointer; touch-action:manipulation;">🥁 TAP! (oder Leertaste)</button>
       </div>`;
-    setTimeout(starteSong, 300);
+    setTimeout(starteSong, 350);
   };
 
   window.trefferKap5Track3 = () => {
     klavierAudio.spieleMidi(72, 0.3, 1.0);
     if (!aktiv) return;
     const aktBeat = (performance.now() - startZeit) / beatMs;
-    const k = notenListe.find((n) => n.status === "offen" && Math.abs(aktBeat - n.beat) <= 0.48);
+    const k = notenListe.find((n) => n.status === "offen" && Math.abs(aktBeat - n.beat) <= 0.58);
     const msgEl = document.getElementById("kap5-msg-3");
     if (!k) return;
     if (k.t === "vp") { k.status = "verpasst"; klavierAudio.spieleQuietsch(); if (msgEl) msgEl.textContent = "🤫 Bei «sch» ist Pause!"; }
-    else { k.status = "ok"; punkte = Math.min(zielPunkte, punkte + 1); if (msgEl) msgEl.textContent = `🔥 PERFEKT! (${punkte} / ${zielPunkte})`; }
+    else { k.status = "ok"; if (msgEl) msgEl.textContent = "🔥 PERFEKT!"; }
   };
   window.onkeydown = (e) => { if (e.code === "Space" && document.getElementById("kap5-pad-3")) { e.preventDefault(); window.trefferKap5Track3(); } };
   renderUI();
 }
-// 5.4 Duolingo-Song-Track: Lange Noten (bon-bon, kau-gum-mi, gum-mi-bärch-en)
+// 5.4 Duolingo-Song-Track: 5 entspannte Songs mit langen Noten (bon-bon, kau-gum-mi, gum-mi-bärch-en)
 function starteKap5SongTrackLangeNoten() {
   const songs = Array.of(
-    { titel: "5.4 Bon-Bon Walzer (3/4)", seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "ph", d: 3, w: "kau-gum-mi" }, { t: "v", d: 1, w: "da" }, { t: "h", d: 2, w: "bon-bon" }, { t: "ph", d: 3, w: "kau-gum-mi" }) },
-    { titel: "5.4 Gummibärchen-Party (4/4)", seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }, { t: "g", d: 4, w: "gum-mi-bärch-en" }, { t: "ph", d: 3, w: "kau-gum-mi" }, { t: "vp", d: 1, w: "sch" }) }
+    { titel: "Song 1/5: Bon-Bon Einstieg (4/4)", seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }) },
+    { titel: "Song 2/5: Kaugummi-Walzer (3/4)", seq: Array.of({ t: "ph", d: 3, w: "kau-gum-mi" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "ph", d: 3, w: "kau-gum-mi" }) },
+    { titel: "Song 3/5: Gummibärchen-Riese (4/4)", seq: Array.of({ t: "g", d: 4, w: "gum-mi-bärch-en" }, { t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "g", d: 4, w: "gum-mi-bärch-en" }) },
+    { titel: "Song 4/5: Süssigkeiten-Mix (4/4)", seq: Array.of({ t: "ph", d: 3, w: "kau-gum-mi" }, { t: "v", d: 1, w: "da" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }) },
+    { titel: "Song 5/5: Lange-Noten-Finale (4/4)", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "g", d: 4, w: "gum-mi-bärch-en" }, { t: "ph", d: 3, w: "kau-gum-mi" }, { t: "vp", d: 1, w: "sch" }) }
   );
 
-  let songIdx = 0, animId = null, aktiv = false, startZeit = 0, notenListe = Array.of(), punkte = 0;
-  const zielPunkte = 10, beatMs = 680, pxProBeat = 105, zielX = 85;
+  let songIdx = 0, animId = null, aktiv = false, startZeit = 0, notenListe = Array.of();
+  const beatMs = 880, pxProBeat = 95, zielX = 85;
   const stopSong = () => { aktiv = false; if (animId) cancelAnimationFrame(animId); };
 
   const starteSong = () => {
     stopSong();
-    const song = songs.at(songIdx % songs.length);
+    const song = songs.at(songIdx);
     let beat = 3;
     notenListe = song.seq.map((n, i) => { const o = { id: i, t: n.t, d: n.d, w: n.w, beat, status: "offen" }; beat += n.d; return o; });
     const gesamtBeats = beat + 1;
@@ -376,11 +392,11 @@ function starteKap5SongTrackLangeNoten() {
     const loop = (jetzt) => {
       if (!aktiv || !document.getElementById("kap5-track-svg-4")) return;
       const aktBeat = (jetzt - startZeit) / beatMs;
-      let svg = `<line x1="20" y1="68" x2="540" y2="68" stroke="#cbd5e1" stroke-width="3"/><rect x="${zielX - 24}" y="16" width="48" height="104" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>`;
+      let svg = `<line x1="20" y1="68" x2="540" y2="68" stroke="#cbd5e1" stroke-width="3"/><rect x="${zielX - 28}" y="16" width="56" height="104" rx="14" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>`;
 
       notenListe.forEach((n) => {
         const x = zielX + (n.beat - aktBeat) * pxProBeat;
-        if (n.status === "offen" && aktBeat - n.beat > 0.48) n.status = n.t === "vp" ? "ok" : "verpasst";
+        if (n.status === "offen" && aktBeat - n.beat > 0.58) n.status = n.t === "vp" ? "ok" : "verpasst";
         if (x < -40 || x > 580) return;
         const f = n.status === "ok" ? "#16a34a" : n.status === "verpasst" ? "#ef4444" : "#1e293b";
         if (n.t === "v") svg += `<ellipse cx="${x}" cy="68" rx="11" ry="8" transform="rotate(-15 ${x} 68)" fill="${f}"/><line x1="${x + 9}" y1="68" x2="${x + 9}" y2="24" stroke="${f}" stroke-width="3"/>`;
@@ -396,8 +412,18 @@ function starteKap5SongTrackLangeNoten() {
       if (el) el.innerHTML = svg;
       if (aktBeat >= gesamtBeats) {
         stopSong();
-        if (punkte >= zielPunkte) { window.onkeydown = null; abschliessenSpiel("kap5_4", 160, "Lange-Noten-Star! 🎸", "bon-bon, kau-gum-mi und gum-mi-bärch-en im Takt gefangen!"); }
-        else { songIdx++; renderUI(`Noch ${zielPunkte - punkte} Treffer bis zum Ziel!`); }
+        const verpasst = notenListe.filter((n) => n.status === "verpasst").length;
+        if (verpasst <= 1) {
+          songIdx++;
+          if (songIdx >= songs.length) {
+            window.onkeydown = null;
+            abschliessenSpiel("kap5_4", 160, "Lange-Noten-Champion! 🎸", "Alle 5 Songs mit bon-bon, kau-gum-mi und gum-mi-bärch-en gemeistert!");
+          } else {
+            renderUI(`Super! Song ${songIdx}/5 geschafft – weiter geht's! ✅`);
+          }
+        } else {
+          renderUI("Fast! Probieren wir diesen Song gleich nochmals gemütlich.");
+        }
         return;
       }
       animId = requestAnimationFrame(loop);
@@ -406,31 +432,31 @@ function starteKap5SongTrackLangeNoten() {
   };
 
   const renderUI = (msg = "") => {
-    const song = songs.at(songIdx % songs.length);
+    const song = songs.at(songIdx);
     document.getElementById("main-content").innerHTML = `
       <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>${song.titel}</span><span>⭐ ${punkte} / ${zielPunkte} Treffer</span></div>
+        <div class="quiz-meta"><span>${song.titel}</span><span>Song ${songIdx + 1} / ${songs.length}</span></div>
         <svg id="kap5-track-svg-4" viewBox="0 0 560 132" style="width:100%; max-width:520px; height:auto; background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; display:block; margin:8px auto;"></svg>
-        <p id="kap5-msg-4" class="quiz-hint" style="font-weight:700;">${msg || "Tippe immer am Anfang der Note im blauen Ziel-Feld!"}</p>
+        <p id="kap5-msg-4" class="quiz-hint" style="font-weight:700;">${msg || "Tippe ganz entspannt am Anfang jeder Note im blauen Ziel-Feld!"}</p>
         <button id="kap5-pad-4" onpointerdown="trefferKap5Track4()" style="width:100%; max-width:350px; height:120px; margin-top:8px; border-radius:22px; border:3px solid #0284c7; background:linear-gradient(135deg,#0ea5e9,#0369a1); color:#fff; font-size:25px; font-weight:900; box-shadow:0 6px 0 #0c4a6e; cursor:pointer; touch-action:manipulation;">🥁 TAP! (oder Leertaste)</button>
       </div>`;
-    setTimeout(starteSong, 300);
+    setTimeout(starteSong, 350);
   };
 
   window.trefferKap5Track4 = () => {
     klavierAudio.spieleMidi(72, 0.3, 1.0);
     if (!aktiv) return;
     const aktBeat = (performance.now() - startZeit) / beatMs;
-    const k = notenListe.find((n) => n.status === "offen" && Math.abs(aktBeat - n.beat) <= 0.48);
+    const k = notenListe.find((n) => n.status === "offen" && Math.abs(aktBeat - n.beat) <= 0.58);
     const msgEl = document.getElementById("kap5-msg-4");
     if (!k) return;
     if (k.t === "vp") { k.status = "verpasst"; klavierAudio.spieleQuietsch(); if (msgEl) msgEl.textContent = "🤫 Bei «sch» ist Pause!"; }
-    else { k.status = "ok"; punkte = Math.min(zielPunkte, punkte + 1); if (msgEl) msgEl.textContent = `🔥 PERFEKT! (${punkte} / ${zielPunkte})`; }
+    else { k.status = "ok"; if (msgEl) msgEl.textContent = "🔥 PERFEKT!"; }
   };
   window.onkeydown = (e) => { if (e.code === "Space" && document.getElementById("kap5-pad-4")) { e.preventDefault(); window.trefferKap5Track4(); } };
   renderUI();
 }
-// 5.5 Boss-Challenge: 5 Blitz-Fragen + grosser Boss-Song-Track mit allen Notenwerten!
+// 5.5 Boss-Challenge: 5 Blitz-Fragen + 3 gemütliche Boss-Songs mit allen Süssigkeiten-Noten!
 function starteKap5Boss() {
   const aufgaben = mischeZufallKap5(Array.of(
     { bild: Array.of({ typ: "g", dauer: 4, wort: "" }), frage: "Boss-Check 1/5: Wie heisst dieses 4-Schlag-Wort?", antwort: "gum-mi-bärch-en", opt: Array.of("gum-mi-bärch-en|4️⃣ gum-mi-bärch-en", "kau-gum-mi|3️⃣ kau-gum-mi") },
@@ -443,7 +469,7 @@ function starteKap5Boss() {
 
   const renderFrage = (hinweis = "") => {
     if (idx >= aufgaben.length) {
-      starteBossFinaleTrack();
+      starteBossFinaleSongs();
       return;
     }
     const akt = aufgaben.at(idx);
@@ -472,23 +498,21 @@ function starteKap5Boss() {
     }
   };
 
-  // Phase 2: Grosser Boss-Song-Track mit allen 4 Süssigkeiten-Noten + Pause
-  const starteBossFinaleTrack = () => {
-    const seq = Array.of(
-      { t: "v", d: 1, w: "da" }, { t: "h", d: 2, w: "bon-bon" }, { t: "vp", d: 1, w: "sch" },
-      { t: "ph", d: 3, w: "kau-gum-mi" }, { t: "v", d: 1, w: "da" },
-      { t: "g", d: 4, w: "gum-mi-bärch-en" },
-      { t: "h", d: 2, w: "bon-bon" }, { t: "vp", d: 1, w: "sch" }, { t: "v", d: 1, w: "da" },
-      { t: "g", d: 4, w: "gum-mi-bärch-en" }
+  const starteBossFinaleSongs = () => {
+    const songs = Array.of(
+      { titel: "Boss-Song 1/3: Süssigkeiten-Mix", seq: Array.of({ t: "v", d: 1, w: "da" }, { t: "h", d: 2, w: "bon-bon" }, { t: "vp", d: 1, w: "sch" }, { t: "ph", d: 3, w: "kau-gum-mi" }, { t: "v", d: 1, w: "da" }) },
+      { titel: "Boss-Song 2/3: Gummibärchen-Tanz", seq: Array.of({ t: "g", d: 4, w: "gum-mi-bärch-en" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "h", d: 2, w: "bon-bon" }) },
+      { titel: "Boss-Song 3/3: Meister-Medley", seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "vp", d: 1, w: "sch" }, { t: "g", d: 4, w: "gum-mi-bärch-en" }, { t: "ph", d: 3, w: "kau-gum-mi" }, { t: "v", d: 1, w: "da" }) }
     );
-    let animId = null, aktiv = false, startZeit = 0, punkte = 0;
-    const zielPunkte = 8, beatMs = 650, pxProBeat = 105, zielX = 85;
+    let songIdx = 0, animId = null, aktiv = false, startZeit = 0, noten = Array.of();
+    const beatMs = 860, pxProBeat = 95, zielX = 85;
     const stopBoss = () => { aktiv = false; if (animId) cancelAnimationFrame(animId); };
 
     const starteLauf = () => {
       stopBoss();
+      const song = songs.at(songIdx);
       let beat = 3;
-      const noten = seq.map((n, i) => { const o = { id: i, t: n.t, d: n.d, w: n.w, beat, status: "offen" }; beat += n.d; return o; });
+      noten = song.seq.map((n, i) => { const o = { id: i, t: n.t, d: n.d, w: n.w, beat, status: "offen" }; beat += n.d; return o; });
       const gesamtBeats = beat + 1;
       const melodie = Array.of(60, 64, 67, 72, 69, 67, 64, 62, 65, 69, 72, 67);
 
@@ -504,11 +528,11 @@ function starteKap5Boss() {
       const loop = (jetzt) => {
         if (!aktiv || !document.getElementById("kap5-boss-svg")) return;
         const aktBeat = (jetzt - startZeit) / beatMs;
-        let svg = `<line x1="20" y1="68" x2="540" y2="68" stroke="#cbd5e1" stroke-width="3"/><rect x="${zielX - 24}" y="16" width="48" height="104" rx="14" fill="#fef3c7" stroke="#d97706" stroke-width="3.5"/>`;
+        let svg = `<line x1="20" y1="68" x2="540" y2="68" stroke="#cbd5e1" stroke-width="3"/><rect x="${zielX - 28}" y="16" width="56" height="104" rx="14" fill="#fef3c7" stroke="#d97706" stroke-width="3.5"/>`;
 
         noten.forEach((n) => {
           const x = zielX + (n.beat - aktBeat) * pxProBeat;
-          if (n.status === "offen" && aktBeat - n.beat > 0.48) n.status = n.t === "vp" ? "ok" : "verpasst";
+          if (n.status === "offen" && aktBeat - n.beat > 0.58) n.status = n.t === "vp" ? "ok" : "verpasst";
           if (x < -40 || x > 580) return;
           const f = n.status === "ok" ? "#16a34a" : n.status === "verpasst" ? "#ef4444" : "#1e293b";
           if (n.t === "v") svg += `<ellipse cx="${x}" cy="68" rx="11" ry="8" transform="rotate(-15 ${x} 68)" fill="${f}"/><line x1="${x + 9}" y1="68" x2="${x + 9}" y2="24" stroke="${f}" stroke-width="3"/>`;
@@ -524,35 +548,49 @@ function starteKap5Boss() {
         if (el) el.innerHTML = svg;
         if (aktBeat >= gesamtBeats) {
           stopBoss();
-          if (punkte >= zielPunkte) { window.onkeydown = null; abschliessenSpiel("kap5_5", 200, "Rhythmus-Entdecker Boss! 🏆", "Blitz-Check UND Boss-Song-Track gemeistert!"); }
-          else { starteLauf(); }
+          const verpasst = noten.filter((n) => n.status === "verpasst").length;
+          if (verpasst <= 1) {
+            songIdx++;
+            if (songIdx >= songs.length) {
+              window.onkeydown = null;
+              abschliessenSpiel("kap5_5", 200, "Rhythmus-Entdecker Boss! 🏆", "Blitz-Check UND alle 3 Boss-Songs gemeistert!");
+            } else {
+              renderBossUI(`Boss-Song ${songIdx}/3 geschafft – auf zum nächsten! 🏆`);
+            }
+          } else {
+            renderBossUI("Fast! Probieren wir diesen Boss-Song gleich nochmals.");
+          }
           return;
         }
         animId = requestAnimationFrame(loop);
       };
       animId = requestAnimationFrame(loop);
-
-      window.trefferKap5BossTrack = () => {
-        klavierAudio.spieleMidi(76, 0.3, 1.0);
-        if (!aktiv) return;
-        const aktBeat = (performance.now() - startZeit) / beatMs;
-        const k = noten.find((n) => n.status === "offen" && Math.abs(aktBeat - n.beat) <= 0.48);
-        const msgEl = document.getElementById("kap5-boss-msg");
-        if (!k) return;
-        if (k.t === "vp") { k.status = "verpasst"; klavierAudio.spieleQuietsch(); if (msgEl) msgEl.textContent = "🤫 Bei «sch» nicht tippen!"; }
-        else { k.status = "ok"; punkte = Math.min(zielPunkte, punkte + 1); if (msgEl) msgEl.textContent = `🏆 BOSS-TREFFER! (${punkte} / ${zielPunkte})`; }
-      };
     };
 
-    document.getElementById("main-content").innerHTML = `
-      <div class="card" style="text-align:center;">
-        <div class="quiz-meta"><span>5.5 Boss Finale: Alle Süssigkeiten</span><span>🏆 Ziel: ${zielPunkte} Treffer</span></div>
-        <svg id="kap5-boss-svg" viewBox="0 0 560 132" style="width:100%; max-width:520px; height:auto; background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; display:block; margin:8px auto;"></svg>
-        <p id="kap5-boss-msg" class="quiz-hint" style="font-weight:700;">Alle Notenwerte gemischt! Fang 8 Noten im goldenen Ziel-Feld!</p>
-        <button id="kap5-boss-pad" onpointerdown="trefferKap5BossTrack()" style="width:100%; max-width:350px; height:120px; margin-top:8px; border-radius:22px; border:3px solid #d97706; background:linear-gradient(135deg,#f59e0b,#b45309); color:#fff; font-size:25px; font-weight:900; box-shadow:0 6px 0 #78350f; cursor:pointer; touch-action:manipulation;">🏆 BOSS-TAP! (oder Leertaste)</button>
-      </div>`;
+    const renderBossUI = (msg = "") => {
+      const song = songs.at(songIdx);
+      document.getElementById("main-content").innerHTML = `
+        <div class="card" style="text-align:center;">
+          <div class="quiz-meta"><span>5.5 ${song.titel}</span><span>Song ${songIdx + 1} / ${songs.length}</span></div>
+          <svg id="kap5-boss-svg" viewBox="0 0 560 132" style="width:100%; max-width:520px; height:auto; background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; display:block; margin:8px auto;"></svg>
+          <p id="kap5-boss-msg" class="quiz-hint" style="font-weight:700;">${msg || "Alle Notenwerte gemischt – tappe im goldenen Feld!"}</p>
+          <button id="kap5-boss-pad" onpointerdown="trefferKap5BossTrack()" style="width:100%; max-width:350px; height:120px; margin-top:8px; border-radius:22px; border:3px solid #d97706; background:linear-gradient(135deg,#f59e0b,#b45309); color:#fff; font-size:25px; font-weight:900; box-shadow:0 6px 0 #78350f; cursor:pointer; touch-action:manipulation;">🏆 BOSS-TAP! (oder Leertaste)</button>
+        </div>`;
+      setTimeout(starteLauf, 350);
+    };
+
+    window.trefferKap5BossTrack = () => {
+      klavierAudio.spieleMidi(76, 0.3, 1.0);
+      if (!aktiv) return;
+      const aktBeat = (performance.now() - startZeit) / beatMs;
+      const k = noten.find((n) => n.status === "offen" && Math.abs(aktBeat - n.beat) <= 0.58);
+      const msgEl = document.getElementById("kap5-boss-msg");
+      if (!k) return;
+      if (k.t === "vp") { k.status = "verpasst"; klavierAudio.spieleQuietsch(); if (msgEl) msgEl.textContent = "🤫 Bei «sch» nicht tippen!"; }
+      else { k.status = "ok"; if (msgEl) msgEl.textContent = "🏆 BOSS-TREFFER!"; }
+    };
     window.onkeydown = (e) => { if (e.code === "Space" && document.getElementById("kap5-boss-pad")) { e.preventDefault(); window.trefferKap5BossTrack(); } };
-    setTimeout(starteLauf, 350);
+    renderBossUI();
   };
 
   renderFrage();
