@@ -1,21 +1,22 @@
 // 1/3 APP.JS: Kapitel-Daten (Stufe 1 & Stufe 2)
 
 const KAPITEL_DATEN = Array.of(
-  {
+    {
     id: 0,
     stufe: 1,
     titel: "1. Gehör & Klang-Entdecker",
     icon: "👂",
     farbe: "#f59e0b",
-    beschreibung: "Melodie-Richtung, Schritt oder Sprung, Staccato, Legato, Dur & Moll!",
+    beschreibung: "Hoch oder tief, gleich oder verschieden, Melodie-Richtung & Staccato/Legato!",
     spiele: Array.of(
-      { id: "kap0_2", titel: "1.1 Steigt oder fällt die Melodie?", punkte: 100, startFn: "starteKap0Spiel(1)" },
-      { id: "kap0_3", titel: "1.2 Schritt oder Sprung?", punkte: 100, startFn: "starteKap0Spiel(2)" },
-      { id: "kap0_4", titel: "1.3 Staccato oder Legato?", punkte: 120, startFn: "starteKap0Spiel(3)" },
-      { id: "kap0_5", titel: "1.4 Dur oder Moll?", punkte: 150, startFn: "starteKap0Spiel(4)" },
-      { id: "kap0_boss", titel: "1.5 Boss-Challenge: Gehör-Meister", punkte: 250, startFn: "starteKap0Spiel(5)" }
+      { id: "kap0_2", titel: "1.1 Hoch oder tief?", punkte: 100, startFn: "starteKap0Spiel(1)" },
+      { id: "kap0_3", titel: "1.2 Gleich oder verschieden?", punkte: 100, startFn: "starteKap0Spiel(2)" },
+      { id: "kap0_4", titel: "1.3 Steigt oder fällt die Melodie?", punkte: 120, startFn: "starteKap0Spiel(3)" },
+      { id: "kap0_5", titel: "1.4 Staccato oder Legato?", punkte: 140, startFn: "starteKap0Spiel(4)" },
+      { id: "kap0_boss", titel: "1.5 Boss-Challenge: Gehör-Entdecker", punkte: 220, startFn: "starteKap0Spiel(5)" }
     )
   },
+
    {
     id: 1,
     stufe: 1,
