@@ -62,21 +62,7 @@ const KAPITEL_DATEN = Array.of(
     )
   },
 
-    {
-    id: 5,
-    stufe: 1,
-    titel: "5. Rhythmus & Notenwerte",
-    icon: "🥁",
-    farbe: "#ea580c",
-    beschreibung: "Viertel, Halbe und Ganze Noten: Klatsche und zähle den Takt wie ein Profi!",
-    spiele: Array.of(
-      { id: "kap5_1", titel: "5.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap5Spiel(1)" },
-      { id: "kap5_2", titel: "5.2 Schläge zählen", punkte: 130, startFn: "starteKap5Spiel(2)" },
-      { id: "kap5_3", titel: "5.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap5Spiel(3)" },
-      { id: "kap5_4", titel: "5.4 Takt-Baumeister", punkte: 160, startFn: "starteKap5Spiel(4)" },
-      { id: "kap5_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap5Spiel(5)" }
-    )
-  },
+
   {
     id: 6,
     stufe: 1,
