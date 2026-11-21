@@ -63,21 +63,22 @@ const KAPITEL_DATEN = Array.of(
     )
   },
   
-    {
+      {
     id: 5,
     stufe: 1,
     titel: "5. Rhythmus & Notenwerte",
     icon: "🥁",
-    farbe: "#ea580c",
-    beschreibung: "Viertel, Halbe und Ganze Noten: Klatsche und zähle den Takt wie ein Profi!",
+    farbe: "#16a34a",
+    beschreibung: "da, bon-bon, kau-gum-mi, gum-mi-bärch-en und der Live-Tap-Groove!",
     spiele: Array.of(
-      { id: "kap5_1", titel: "5.1 Notenwerte erkennen", punkte: 120, startFn: "starteKap5Spiel(1)" },
-      { id: "kap5_2", titel: "5.2 Schläge zählen", punkte: 130, startFn: "starteKap5Spiel(2)" },
-      { id: "kap5_3", titel: "5.3 Rhythmus klopfen", punkte: 150, startFn: "starteKap5Spiel(3)" },
-      { id: "kap5_4", titel: "5.4 Takt-Baumeister", punkte: 160, startFn: "starteKap5Spiel(4)" },
-      { id: "kap5_5", titel: "5.5 Rhythmus-Meister", punkte: 200, startFn: "starteKap5Spiel(5)" }
+      { id: "kap5_1", titel: "5.1 Süssigkeiten-Notenwerte", punkte: 100, startFn: "starteKap5Spiel(1)" },
+      { id: "kap5_2", titel: "5.2 Schläge zusammenzählen", punkte: 120, startFn: "starteKap5Spiel(2)" },
+      { id: "kap5_3", titel: "5.3 Live-Tap-Groove: da & sch", punkte: 140, startFn: "starteKap5Spiel(3)" },
+      { id: "kap5_4", titel: "5.4 Live-Tap-Groove: Lange Noten", punkte: 160, startFn: "starteKap5Spiel(4)" },
+      { id: "kap5_5", titel: "5.5 Boss-Challenge: Rhythmus-Entdecker", punkte: 200, startFn: "starteKap5Spiel(5)" }
     )
   },
+
     {
     id: 6,
     stufe: 1,
@@ -125,6 +126,37 @@ const KAPITEL_DATEN = Array.of(
       { id: "kap8_6", titel: "8.5 Bassschlüssel-Profi", punkte: 250, startFn: "starteKap8Spiel(5)" }
     )
   }
+    {
+    id: 9,
+    stufe: 2,
+    titel: "9. Schwarze Tasten & Kreuz (♯)",
+    icon: "♯",
+    farbe: "#d97706",
+    beschreibung: "Zwillinge (cis, dis) und Drillinge (fis, gis, ais) – erhöhte Töne entdecken!",
+    spiele: Array.of(
+      { id: "kap9_1", titel: "9.1 Was macht das Kreuz (♯)?", punkte: 140, startFn: "starteKap9Spiel(1)" },
+      { id: "kap9_2", titel: "9.2 Zwillinge: cis & dis", punkte: 150, startFn: "starteKap9Spiel(2)" },
+      { id: "kap9_3", titel: "9.3 Drillinge: fis, gis & ais", punkte: 170, startFn: "starteKap9Spiel(3)" },
+      { id: "kap9_4", titel: "9.4 Alle 5 Kreuz-Tasten", punkte: 190, startFn: "starteKap9Spiel(4)" },
+      { id: "kap9_5", titel: "9.5 Boss-Challenge: Kreuz-Entdecker", punkte: 230, startFn: "starteKap9Spiel(5)" }
+    )
+  },
+  {
+    id: 10,
+    stufe: 2,
+    titel: "10. Lautstärke & Ausdruck",
+    icon: "🔊",
+    farbe: "#7c3aed",
+    beschreibung: "Leise (p), mittellaut (mf), laut (f), crescendo und decrescendo hören & erkennen!",
+    spiele: Array.of(
+      { id: "kap10_1", titel: "10.1 Leise (p), mittellaut (mf) & laut (f)", punkte: 140, startFn: "starteKap10Spiel(1)" },
+      { id: "kap10_2", titel: "10.2 Piano oder Forte hören?", punkte: 160, startFn: "starteKap10Spiel(2)" },
+      { id: "kap10_3", titel: "10.3 Crescendo & Decrescendo", punkte: 170, startFn: "starteKap10Spiel(3)" },
+      { id: "kap10_4", titel: "10.4 Wird es lauter oder leiser?", punkte: 190, startFn: "starteKap10Spiel(4)" },
+      { id: "kap10_5", titel: "10.5 Boss-Challenge: Dynamik-Dirigent", punkte: 230, startFn: "starteKap10Spiel(5)" }
+    )
+  },
+
 );
 
 // 2/3 APP.JS: Fortschritts-Speicher & Startseite (mit Auto-Schliessen erledigter Stufen)
