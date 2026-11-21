@@ -385,9 +385,18 @@ function starteKap5SongTrackLangeNoten() {
   starteKap5SongTrackEngine({
     svgId: "kap5-svg-4", msgId: "kap5-msg-4", padId: "kap5-pad-4", tapFnName: "tapKap5LangeNoten",
     zoneFill: "#e0f2fe", zoneStroke: "#0284c7", btnBorder: "#0284c7", btnBg: "linear-gradient(135deg,#0ea5e9,#0369a1)", btnShadow: "#0c4a6e",
-    btnLabel: "🥁 TAP! (oder Leertaste)",
+    btnLabel: "🎹 DRÜCKEN & HALTEN!",
     songs: Array.of(
-      { titel: "5.4 Song 1: Bon-Bon Einstieg", takt: 4, seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" }) },
+      {
+        titel: "5.4 Song 1: Dance-Pop Drop",
+        takt: 4,
+        bpm: 76,
+        mp3: "sounds/dancepop_76bpm.mp3",
+        vorlauf: 4,
+        offsetMs: 3158,
+        hatIntro: true,
+        seq: Array.of({ t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "v", d: 1, w: "da" })
+      },
       { titel: "5.4 Song 2: Kaugummi-Walzer", takt: 3, seq: Array.of({ t: "ph", d: 3, w: "kau-gum-mi" }, { t: "h", d: 2, w: "bon-bon" }, { t: "v", d: 1, w: "da" }, { t: "ph", d: 3, w: "kau-gum-mi" }) },
       { titel: "5.4 Song 3: Gummibärchen-Riese", takt: 4, seq: Array.of({ t: "g", d: 4, w: "gum-mi-bärch-en" }, { t: "h", d: 2, w: "bon-bon" }, { t: "h", d: 2, w: "bon-bon" }, { t: "g", d: 4, w: "gum-mi-bärch-en" }) },
       { titel: "5.4 Song 4: Süssigkeiten-Mix", takt: 3, seq: Array.of({ t: "ph", d: 3, w: "kau-gum-mi" }, { t: "h", d: 2, w: "bon-bon" }, { t: "vp", d: 1, w: "sch" }, { t: "ph", d: 3, w: "kau-gum-mi" }) },
